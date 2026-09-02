@@ -500,7 +500,8 @@ export function createServerApp() {
         '1',
         inspection.version,
         [],
-        true // isListingOnly = true
+        true,
+        'CONNECT_SCAN'
       );
 
       res.json({

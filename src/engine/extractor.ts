@@ -45,14 +45,14 @@ export const APP_STORE_SCREENSHOT_SIZES: { label: string; width: number; height:
   { label: '6.7" iPhone', width: 2796, height: 1290 },
   { label: '6.5" iPhone', width: 1284, height: 2778 },
   { label: '6.5" iPhone', width: 2778, height: 1284 },
-  { label: '6.5" iPhone', width: 1242, height: 2688 },
-  { label: '6.5" iPhone', width: 2688, height: 1242 },
   { label: '5.5" iPhone', width: 1242, height: 2208 },
   { label: '5.5" iPhone', width: 2208, height: 1242 },
   { label: '13" iPad', width: 2064, height: 2752 },
   { label: '13" iPad', width: 2752, height: 2064 },
   { label: '12.9" iPad', width: 2048, height: 2732 },
-  { label: '12.9" iPad', width: 2732, height: 2048 }
+  { label: '12.9" iPad', width: 2732, height: 2048 },
+  { label: '11" iPad', width: 1668, height: 2388 },
+  { label: '11" iPad', width: 2388, height: 1668 }
 ];
 
 export function isValidAppStoreScreenshotSize(width: number, height: number): boolean {

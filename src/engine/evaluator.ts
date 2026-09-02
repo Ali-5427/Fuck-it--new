@@ -435,7 +435,16 @@ function evaluateRule(ruleId: string, inspection: NormalizedAppInspection, ruleW
         };
       }
       const measured = inspection.screenshots.filter(shot => shot.precision === 'EXACT' && typeof shot.isValidSize === 'boolean');
-      if (measured.length === 0) return empty;
+      if (measured.length === 0) {
+        return {
+          triggered: true,
+          severity: 'MANUAL_CHECK',
+          evidence: [evidence('Screenshots', 'Submission assets', 'UNKNOWN', 'Screenshot pixel dimensions were not available for this check.')],
+          why: 'App Store Connect requires screenshots at exact device sizes, but this scan could not verify the uploaded image pixels.',
+          action: 'Confirm each screenshot uses an official App Store Connect pixel dimension before submitting.',
+          verify: 'Check the pixel dimensions of each screenshot in Preview or the Finder Get Info panel.'
+        };
+      }
       const invalid = measured.filter(shot => shot.isValidSize === false);
       if (invalid.length === 0) return empty;
       return {
@@ -461,7 +470,16 @@ function evaluateRule(ruleId: string, inspection: NormalizedAppInspection, ruleW
 
     case 'RULE-SEC-01': {
       const encryptionStatus = inspection.security.usesNonExemptEncryptionDeclared;
-      if (encryptionStatus === true || encryptionStatus === false) return empty;
+      if (encryptionStatus === false) return empty;
+      if (encryptionStatus === true) {
+        return {
+          triggered: true,
+          evidence: [evidence('ITSAppUsesNonExemptEncryption', 'App Store Connect / Info.plist', 'DETECTED', 'Non-exempt encryption was declared and requires export compliance confirmation.')],
+          why: 'Apps using non-exempt encryption must complete Apple export compliance requirements.',
+          action: 'Complete the applicable export compliance questions in App Store Connect.',
+          verify: 'Confirm the encryption technology and required export documentation for this build.'
+        };
+      }
       if (encryptionStatus === 'UNKNOWN') {
         return {
           triggered: true,

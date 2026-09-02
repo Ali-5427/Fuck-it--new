@@ -388,7 +388,7 @@ case .userCancelled, .pending:
     guidelineRef: 'Guideline 2.3.3',
     title: 'Invalid Screenshot Dimensions for Required Device Sizes',
     severity: 'HIGH',
-    description: 'App Store Connect requires exact pixel dimensions for primary device classes (e.g. 1320x2868 for 6.9" iPhone 16 Pro Max, 1290x2796 for 6.7" iPhone 15 Pro Max, 1242x2688 for 6.5", 1242x2208 for 5.5", 2064x2752 for 13" iPad Pro).',
+    description: 'App Store Connect requires exact pixel dimensions for primary device classes (e.g. 1320x2868 for 6.9" iPhone, 1290x2796 for 6.7" iPhone, 1284x2778 for 6.5" iPhone, 1242x2208 for 5.5" iPhone, and 2064x2752 for 13" iPad).',
     detectionMethod: 'STATIC_ANALYSIS',
     evidenceRequired: ['Screenshot width and height dimensions'],
     remediationGuidance: 'Export screenshots at exact supported App Store Connect dimensions without transparent pixels or invalid aspect ratios.',
@@ -469,12 +469,12 @@ export const RULE_COUNT = APP_STORE_RULES.length;
 const RULES_OVERRIDE_KEY = 'fixit_rules_override';
 
 export function getStoredRuleOverrides(): Record<string, boolean> {
-  if (typeof globalThis === 'undefined' || !('localStorage' in globalThis)) {
+  if (typeof window === 'undefined' || !window.localStorage) {
     return {};
   }
 
   try {
-    const raw = globalThis.localStorage.getItem(RULES_OVERRIDE_KEY);
+    const raw = window.localStorage.getItem(RULES_OVERRIDE_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch (err) {
     console.warn('Error reading rule overrides from localStorage:', err);
@@ -483,14 +483,14 @@ export function getStoredRuleOverrides(): Record<string, boolean> {
 }
 
 export function saveStoredRuleOverride(ruleId: string, enabled: boolean): Record<string, boolean> {
-  if (typeof globalThis === 'undefined' || !('localStorage' in globalThis)) {
+  if (typeof window === 'undefined' || !window.localStorage) {
     return {};
   }
 
   try {
     const overrides = getStoredRuleOverrides();
     overrides[ruleId] = enabled;
-    globalThis.localStorage.setItem(RULES_OVERRIDE_KEY, JSON.stringify(overrides));
+    window.localStorage.setItem(RULES_OVERRIDE_KEY, JSON.stringify(overrides));
     return overrides;
   } catch (err) {
     console.warn('Error persisting rule override to localStorage:', err);

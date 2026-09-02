@@ -198,7 +198,7 @@ export default function App() {
 
   const handleConnectAuditCompleted = (inspection: any, auditRun: any) => {
     const appleAppId = inspection?.rawInfo?.app?.id || inspection?.rawInfo?.appleAppId || inspection?.rawInfo?.appId;
-    store.createApp({
+    const appPromise = store.createApp({
       name: inspection.metadata.name,
       bundleId: inspection.bundleId,
       primaryCategory: inspection.metadata.category,
@@ -206,7 +206,12 @@ export default function App() {
       currentBuild: inspection.build,
       appleAppId,
       auditType: 'CONNECT_SCAN',
-      inspection
+      inspection,
+      auditRun
+    });
+    appPromise.then(app => {
+      store.setActiveAudit(auditRun.id);
+      store.selectApp(app.id);
     });
     setAccountModalOpen(false);
     setCurrentView('audit');

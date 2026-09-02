@@ -132,10 +132,7 @@ export const AuditView: React.FC<AuditViewProps> = ({
             onOpenDiff(comparison);
           }
         } else {
-          const { comparison } = await store.runNewAudit(app.id);
-          if (comparison) {
-            onOpenDiff(comparison);
-          }
+          throw new Error('This Connect app is missing its App Store Connect app ID. Reconnect the app and try again.');
         }
       }
     } catch (e: any) {
@@ -148,8 +145,7 @@ export const AuditView: React.FC<AuditViewProps> = ({
 
   const filteredFindings = audit.findings.filter(f => {
     const matchesCat = categoryFilter === 'ALL'
-      || f.category === categoryFilter
-      || (categoryFilter === 'USER_GENERATED_CONTENT' && f.category === 'UGC');
+      || f.category === categoryFilter;
     const matchesSev = severityFilter === 'ALL' || f.severity === severityFilter;
     const matchesStat = statusFilter === 'ALL' || 
       (statusFilter === 'OPEN' && (f.status === 'OPEN' || f.status === 'IN_PROGRESS')) ||

@@ -1,5 +1,6 @@
 import { NormalizedAppInspection } from '../types';
 import { AppDetailsFromConnect } from '../server/appStoreConnect';
+import { APP_STORE_SCREENSHOT_SIZES } from './extractor';
 
 /**
  * Maps App Store Connect API details into the unified NormalizedAppInspection format.
@@ -30,15 +31,6 @@ export function extractFromAppStoreConnect(
   const name = app.attributes?.name || primaryInfo.name || 'App Store Connect App';
   const subtitle = fetchedSubtitle || primaryInfo.subtitle || undefined;
   const description = fetchedDescription || primaryInfo.description || undefined;
-  const validScreenshotSizes = [
-    { name: 'iPhone 6.9" (16 Pro Max)', w: 1320, h: 2868 },
-    { name: 'iPhone 6.7" (15 Pro Max / 14 Pro Max)', w: 1290, h: 2796 },
-    { name: 'iPhone 6.5" (11 Pro Max / XS Max)', w: 1242, h: 2688 },
-    { name: 'iPhone 5.5" (8 Plus / 7 Plus)', w: 1242, h: 2208 },
-    { name: 'iPad Pro 13" / 12.9"', w: 2064, h: 2752 },
-    { name: 'iPad Pro 11"', w: 1668, h: 2388 }
-  ];
-
   // Age rating normalization: e.g. "FOUR_PLUS" -> "4+", "TWELVE_PLUS" -> "12+"
   let normalizedAgeRating = '4+';
   if (ageRating) {
@@ -105,8 +97,8 @@ export function extractFromAppStoreConnect(
     },
     screenshots: screenshots && screenshots.length > 0
       ? screenshots.map((s, idx) => {
-          const exactMatch = validScreenshotSizes.find(
-            size => (size.w === s.width && size.h === s.height) || (size.w === s.height && size.h === s.width)
+          const exactMatch = APP_STORE_SCREENSHOT_SIZES.find(
+            size => (size.width === s.width && size.height === s.height) || (size.width === s.height && size.height === s.width)
           );
           return {
             id: `ss_connect_${idx + 1}`,
@@ -114,7 +106,7 @@ export function extractFromAppStoreConnect(
             width: s.width,
             height: s.height,
             format: 'PNG',
-            deviceTarget: s.deviceType || exactMatch?.name || 'iPhone 6.7"',
+            deviceTarget: s.deviceType || exactMatch?.label || 'UNKNOWN',
             aspectRatio: s.height > s.width ? '9:19.5' : '19.5:9',
             isValidSize: Boolean(exactMatch),
             precision: exactMatch ? 'EXACT' as const : 'UNKNOWN' as const

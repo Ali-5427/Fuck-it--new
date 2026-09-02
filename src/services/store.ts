@@ -222,7 +222,7 @@ class AppStore {
     const statusMap: Record<string, AuditRun['readinessStatus']> = {
       HIGH_RISK: 'NOT_READY',
       READY: 'NO_HIGH_RISK_ISSUES_DETECTED',
-      MANUAL_REVIEW_REQUIRED: 'NO_HIGH_RISK_ISSUES_DETECTED',
+      MANUAL_REVIEW_REQUIRED: 'READY_WITH_WARNINGS',
       READY_WITH_WARNINGS: 'READY_WITH_WARNINGS',
       NOT_READY: 'NOT_READY',
       NO_HIGH_RISK_ISSUES_DETECTED: 'NO_HIGH_RISK_ISSUES_DETECTED'
@@ -248,7 +248,7 @@ class AppStore {
     const statusMap: Record<string, AuditRun['readinessStatus']> = {
       HIGH_RISK: 'NOT_READY',
       READY: 'NO_HIGH_RISK_ISSUES_DETECTED',
-      MANUAL_REVIEW_REQUIRED: 'NO_HIGH_RISK_ISSUES_DETECTED',
+      MANUAL_REVIEW_REQUIRED: 'READY_WITH_WARNINGS',
       READY_WITH_WARNINGS: 'READY_WITH_WARNINGS',
       NOT_READY: 'NOT_READY',
       NO_HIGH_RISK_ISSUES_DETECTED: 'NO_HIGH_RISK_ISSUES_DETECTED'
@@ -432,6 +432,7 @@ class AppStore {
     inspection?: NormalizedAppInspection;
     auditType?: AuditScanType;
     appleAppId?: string;
+    auditRun?: AuditRun;
   }): Promise<Application> {
     if (!data.inspection) {
       throw new Error('An extracted inspection is required to create an app.');
@@ -470,19 +471,24 @@ class AppStore {
     this.apps.unshift(newApp);
     this.inspectionsMap[id] = inspection;
 
-    const initialAudit = evaluateInspection(
-      inspection,
-      id,
-      newApp.currentBuild,
-      newApp.currentVersion,
-      [],
-      resolvedAuditType === 'LISTING_SCAN',
-      resolvedAuditType
-    );
+    const initialAudit = data.auditRun
+      ? { ...data.auditRun, appId: id, auditType: resolvedAuditType }
+      : evaluateInspection(
+          inspection,
+          id,
+          newApp.currentBuild,
+          newApp.currentVersion,
+          [],
+          resolvedAuditType === 'LISTING_SCAN' || resolvedAuditType === 'CONNECT_SCAN',
+          resolvedAuditType
+        );
 
     try {
+      if (data.auditRun) {
+        this.auditsMap[id] = [initialAudit];
+      }
       const aiResult = await apiClient.enhanceAuditWithAI(inspection, initialAudit.findings);
-      if (aiResult && aiResult.enhancedFindings) {
+      if (!data.auditRun && aiResult && aiResult.enhancedFindings) {
         initialAudit.findings = aiResult.enhancedFindings;
         initialAudit.summary = aiResult.executiveSummary || initialAudit.summary;
         initialAudit.reviewerNotesDraft = aiResult.reviewerNotes || initialAudit.reviewerNotesDraft;
