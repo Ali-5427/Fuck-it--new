@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* 
+ * Z-INDEX STACKING SCALE
+ * Use these fixed tiers for overlay stacking context to prevent z-index wars.
+ * 
+ * z-40     : Base overlay backdrops (the dark/blurred background behind modals)
+ * z-50     : Standard modals (AccountModal, UploadModal, AuthModal, etc.) and fixed headers
+ * z-60     : Nested/stacked dialogs (e.g. Confirm dialogs that appear over another modal)
+ * z-[100]  : Toasts/Notifications (always globally visible)
+ */
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+    overflow-x: hidden;
+  }
+  
+  code, pre, kbd {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  button, 
+  a, 
+  select, 
+  summary, 
+  [role="button"], 
+  [role="tab"],
+  input[type="button"], 
+  input[type="submit"], 
+  input[type="reset"], 
+  input[type="checkbox"], 
+  input[type="radio"], 
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+/* Light & Dark Grid Patterns */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+}
+
+.bg-dot-pattern {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+}
+
+.bg-grid-blue {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+}
+
+/* Glassmorphism surfaces for light theme */
+.glass-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-light-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+.glass-light-elevated {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(59, 130, 246, 0.05);
+}
+
+/* Glows */
+.glow-blue {
+  box-shadow: 0 0 50px -10px rgba(59, 130, 246, 0.15);
+}
+
+.glow-blue-card {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 12px 30px -8px rgba(59, 130, 246, 0.08);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+}

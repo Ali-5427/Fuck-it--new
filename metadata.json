@@ -1,0 +1,6 @@
+{
+  "name": "Fixit",
+  "description": "App Store preflight audit engine for iOS apps. Upload builds, run structured guideline compliance checks, track remediations, and generate submission readiness reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
