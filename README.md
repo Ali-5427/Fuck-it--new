@@ -61,6 +61,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Use `.env.local` for local development or set the same values in your deployment environment.
 
+The deployed API function is configured for up to 60 seconds. Connect checks require a Vercel plan that supports that function duration; on shorter-duration plans, the platform may terminate the request before Apple responds.
+
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `VITE_INSFORGE_BASE_URL` | Yes | InsForge project base URL |

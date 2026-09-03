@@ -196,9 +196,9 @@ export default function App() {
     }
   };
 
-  const handleConnectAuditCompleted = (inspection: any, auditRun: any) => {
+  const handleConnectAuditCompleted = async (inspection: any, auditRun: any) => {
     const appleAppId = inspection?.rawInfo?.app?.id || inspection?.rawInfo?.appleAppId || inspection?.rawInfo?.appId;
-    const appPromise = store.createApp({
+    const app = await store.createApp({
       name: inspection.metadata.name,
       bundleId: inspection.bundleId,
       primaryCategory: inspection.metadata.category,
@@ -209,10 +209,9 @@ export default function App() {
       inspection,
       auditRun
     });
-    appPromise.then(app => {
-      store.setActiveAudit(auditRun.id);
-      store.selectApp(app.id);
-    });
+    store.selectApp(app.id);
+    const actualAudit = store.getLatestAudit(app.id);
+    if (actualAudit) store.setActiveAudit(actualAudit.id);
     setAccountModalOpen(false);
     setCurrentView('audit');
   };

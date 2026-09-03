@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { APP_STORE_RULES } from '../engine/rules';
 import { 
   Activity, 
   CheckCircle2, 
@@ -14,7 +15,7 @@ interface StatusPageModalProps {
 
 export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClose }) => {
   useScrollLock(isOpen);
-  const [health, setHealth] = useState<{ ok: boolean; message: string } | null>(null);
+  const [health, setHealth] = useState<{ ok: boolean; message: string; timestamp?: string } | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -27,14 +28,12 @@ export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClos
         const data = await response.json();
         setHealth({
           ok: data?.status === 'healthy',
-          message: data?.status === 'healthy' ? 'API health check passed.' : 'API health check returned a non-healthy status.'
+          message: data?.status === 'healthy' ? 'API health check passed.' : 'API health check returned a non-healthy status.',
+          timestamp: data?.timestamp
         });
       })
       .catch(() => {
-        setHealth({
-          ok: false,
-          message: 'Static status view only: local API health endpoint is unavailable.'
-        });
+        setHealth({ ok: false, message: 'API health endpoint is unavailable.' });
       });
   }, [isOpen]);
 
@@ -76,9 +75,11 @@ export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClos
             <div>
               <h2 className="text-lg font-bold text-slate-950 flex items-center gap-2">
                 System Status & Health
-                <span className="flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                  All Systems Normal
+                <span className={`flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-full font-semibold ${
+                  health?.ok ? 'bg-emerald-100 text-emerald-800' : health ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${health?.ok ? 'bg-emerald-600 animate-pulse' : health ? 'bg-red-600' : 'bg-slate-500'}`} />
+                  {health?.ok ? 'API Healthy' : health ? 'API Unavailable' : 'Checking API'}
                 </span>
               </h2>
               <p className="text-xs text-slate-600">
@@ -97,15 +98,17 @@ export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClos
 
         {/* Global Summary Card */}
         <div className="p-6 bg-slate-50 border-b border-slate-200">
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+          <div className={`p-4 rounded-xl border flex items-center justify-between ${
+            health?.ok ? 'bg-emerald-50 border-emerald-200' : health ? 'bg-red-50 border-red-200' : 'bg-slate-100 border-slate-200'
+          }`}>
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+              <CheckCircle2 className={`h-6 w-6 shrink-0 ${health?.ok ? 'text-emerald-600' : 'text-slate-500'}`} />
               <div>
-                <h3 className="text-sm font-bold text-emerald-950">
-                  {health?.ok ? 'API health check passed' : 'Status page is static'}
+                <h3 className={`text-sm font-bold ${health?.ok ? 'text-emerald-950' : 'text-slate-900'}`}>
+                  {health?.ok ? 'API health check passed' : health ? 'API health check failed' : 'Checking API health'}
                 </h3>
-                <p className="text-xs text-emerald-800 mt-0.5">
-                  {health?.message || 'Operational status is shown for the app and any configured services.'}
+                <p className={`text-xs mt-0.5 ${health?.ok ? 'text-emerald-800' : 'text-slate-600'}`}>
+                  {health?.message || 'Checking the API health endpoint.'}
                 </p>
               </div>
             </div>
@@ -114,15 +117,15 @@ export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClos
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 text-center">
             <div className="p-3 bg-white rounded-xl border border-slate-200">
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Scan Latency</span>
-              <span className="text-base font-extrabold text-slate-900 font-mono">18ms</span>
+              <span className="text-base font-extrabold text-slate-900 font-mono">n/a</span>
             </div>
             <div className="p-3 bg-white rounded-xl border border-slate-200">
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">AI Correlation</span>
-              <span className="text-base font-extrabold text-slate-900 font-mono">240ms</span>
+              <span className="text-base font-extrabold text-slate-900 font-mono">n/a</span>
             </div>
             <div className="p-3 bg-white rounded-xl border border-slate-200">
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Active Rules</span>
-              <span className="text-base font-extrabold text-slate-900 font-mono">38 Rules</span>
+              <span className="text-base font-extrabold text-slate-900 font-mono">{APP_STORE_RULES.length} Rules</span>
             </div>
           </div>
         </div>
@@ -140,7 +143,7 @@ export const StatusPageModal: React.FC<StatusPageModalProps> = ({ isOpen, onClos
                     {svc.status}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">{svc.desc}</p>
+                <p className="text-[11px] text-slate-500 mt-1">{svc.detail}</p>
               </div>
 
               <div className="text-right shrink-0">

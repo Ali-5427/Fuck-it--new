@@ -56,14 +56,15 @@ function getGenAI(): GoogleGenAI | null {
 export async function enhanceAuditWithAI(
   inspection: NormalizedAppInspection,
   findings: Finding[]
-): Promise<{ enhancedFindings: Finding[]; reviewerNotes: string; executiveSummary: string }> {
+): Promise<{ enhancedFindings: Finding[]; reviewerNotes: string; executiveSummary: string; aiEnhanced: boolean }> {
   const ai = getGenAI();
 
   if (!ai || findings.length === 0) {
     return {
       enhancedFindings: findings,
       reviewerNotes: generateFallbackReviewerNotes(inspection),
-      executiveSummary: generateFallbackSummary(inspection, findings)
+      executiveSummary: generateFallbackSummary(inspection, findings),
+      aiEnhanced: false
     };
   }
 
@@ -135,14 +136,16 @@ Return JSON in this format:
     return {
       enhancedFindings: enhanced,
       reviewerNotes: parsed.reviewerNotes || generateFallbackReviewerNotes(inspection),
-      executiveSummary: parsed.executiveSummary || generateFallbackSummary(inspection, findings)
+      executiveSummary: parsed.executiveSummary || generateFallbackSummary(inspection, findings),
+      aiEnhanced: true
     };
   } catch (error) {
     console.error('Error enhancing audit with AI:', error);
     return {
       enhancedFindings: findings,
       reviewerNotes: generateFallbackReviewerNotes(inspection),
-      executiveSummary: generateFallbackSummary(inspection, findings)
+      executiveSummary: generateFallbackSummary(inspection, findings),
+      aiEnhanced: false
     };
   }
 }

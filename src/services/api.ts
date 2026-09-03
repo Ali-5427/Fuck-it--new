@@ -13,6 +13,15 @@ import { evaluateInspection } from '../engine/evaluator';
 
 const DEFAULT_TIMEOUT_MS = 15000;
 
+async function getAuthHeaders(): Promise<Record<string, string> | null> {
+  const token = await insforge.getHttpClient().getValidAccessToken();
+  if (!token) return null;
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+}
+
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs: number = DEFAULT_TIMEOUT_MS): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -42,23 +51,27 @@ export const apiClient = {
 
   async enhanceAuditWithAI(inspection: NormalizedAppInspection, findings: Finding[]) {
     try {
+      const headers = await getAuthHeaders();
+      if (!headers) return { enhancedFindings: findings, aiEnhanced: false };
       const res = await fetchWithTimeout('/api/ai/correlate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ inspection, findings })
       }, 15000);
       if (!res.ok) throw new Error('AI correlation failed');
       return await res.json();
     } catch (err) {
       console.warn('AI enhancement fallback to rule-based engine:', err);
-      return { enhancedFindings: findings };
+      return { enhancedFindings: findings, aiEnhanced: false };
     }
   },
 
   async analyzeRejection(rejectionText: string): Promise<RejectionAnalysisResult> {
+    const headers = await getAuthHeaders();
+    if (!headers) throw new Error('Authentication is required for rejection analysis.');
     const res = await fetchWithTimeout('/api/rejection/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ rejectionText })
     }, 15000);
     if (!res.ok) throw new Error('Failed to analyze rejection message');
@@ -66,9 +79,11 @@ export const apiClient = {
   },
 
   async validateMetadata(metadata: AppMetadataDraft): Promise<{ issues: MetadataIssue[]; suggestions: string[] }> {
+    const headers = await getAuthHeaders();
+    if (!headers) throw new Error('Authentication is required for metadata validation.');
     const res = await fetchWithTimeout('/api/metadata/validate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ metadata })
     }, 15000);
     if (!res.ok) throw new Error('Failed to validate metadata');

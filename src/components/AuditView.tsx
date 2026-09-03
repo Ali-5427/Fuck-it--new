@@ -20,7 +20,7 @@ import {
   Clock
 } from 'lucide-react';
 import { Application, AuditRun, Finding, FindingStatus, RuleCategory } from '../types';
-import { store } from '../services/store';
+import { inferAuditTypeFromInspection, store } from '../services/store';
 import { compareAudits, evaluateInspection } from '../engine/evaluator';
 import { extractFromItunesLookup } from '../engine/itunesExtractor';
 import { apiClient } from '../services/api';
@@ -78,7 +78,16 @@ export const AuditView: React.FC<AuditViewProps> = ({
   const handleReRunAudit = async () => {
     if (!app || !audit) return;
 
-    if (audit.auditType === 'BINARY_SCAN') {
+    const cachedInspection = store.getInspection(app.id) || undefined;
+    const inferredAuditType = audit.auditType || inferAuditTypeFromInspection({
+      ...cachedInspection,
+      rawInfo: {
+        ...(cachedInspection?.rawInfo || {}),
+        ...(app.appleAppId ? { appleAppId: app.appleAppId } : {})
+      }
+    });
+
+    if (inferredAuditType === 'BINARY_SCAN') {
       onOpenUpload(app.id);
       return;
     }
@@ -95,8 +104,8 @@ export const AuditView: React.FC<AuditViewProps> = ({
         return;
       }
 
-      if (audit.auditType === 'LISTING_SCAN') {
-        const inspection = store.getInspection(app.id) || undefined;
+      if (inferredAuditType === 'LISTING_SCAN') {
+        const inspection = cachedInspection;
         const trackId = inspection?.rawInfo?.trackId;
         const lookupValue = trackId ? String(trackId) : app.bundleId || app.name;
         const liveInspection = await extractFromItunesLookup(lookupValue);
@@ -117,7 +126,7 @@ export const AuditView: React.FC<AuditViewProps> = ({
         return;
       }
 
-      if (audit.auditType === 'CONNECT_SCAN') {
+      if (inferredAuditType === 'CONNECT_SCAN') {
         const appleAppId = app.appleAppId || (app as any).appleAppId;
         if (appleAppId) {
           const { inspection: liveInspection } = await apiClient.checkConnectApp(appleAppId);
@@ -165,15 +174,18 @@ export const AuditView: React.FC<AuditViewProps> = ({
     'PRIVACY',
     'PERMISSIONS',
     'ACCOUNT_REQUIREMENTS',
+    'PAYMENTS_IAP',
     'SUBSCRIPTIONS',
     'UGC',
     'METADATA',
+    'SCREENSHOTS',
+    'APP_COMPLETENESS',
+    'BACKGROUND_MODES',
     'SECURITY_ENCRYPTION'
   ];
 
   return (
     <div className="w-full h-full bg-white flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto min-h-0 w-full">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6 min-h-[calc(100vh-140px)]">
       
       {isTryNow && (

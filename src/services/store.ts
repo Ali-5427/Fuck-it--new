@@ -18,11 +18,24 @@ import { insforge } from './insforge';
 export function inferAuditTypeFromInspection(inspection?: Partial<NormalizedAppInspection> | null): AuditScanType {
   if (!inspection) return 'BINARY_SCAN';
 
+  const rawInfo = inspection.rawInfo && typeof inspection.rawInfo === 'object' ? inspection.rawInfo as Record<string, any> : {};
+  const hasPermissionKeys = Array.isArray(inspection.permissions)
+    ? inspection.permissions.some(item => item.detected)
+    : false;
+  const hasFrameworks = Array.isArray(inspection.frameworks) && inspection.frameworks.length > 0;
+
+  if (hasPermissionKeys || hasFrameworks) {
+    return 'BINARY_SCAN';
+  }
+
+  if (rawInfo.appleAppId || rawInfo.app?.id) {
+    return 'CONNECT_SCAN';
+  }
+
   if (inspection.metadata?.listingProvided) {
     return 'LISTING_SCAN';
   }
 
-  const rawInfo = inspection.rawInfo && typeof inspection.rawInfo === 'object' ? inspection.rawInfo as Record<string, any> : {};
   const hasConnectSignals = !!(
     rawInfo.inAppPurchases ||
     rawInfo.subscriptionGroups ||
@@ -34,12 +47,7 @@ export function inferAuditTypeFromInspection(inspection?: Partial<NormalizedAppI
     return 'CONNECT_SCAN';
   }
 
-  const hasPermissionKeys = Array.isArray(inspection.permissions)
-    ? inspection.permissions.some(item => item.detected)
-    : false;
-  const hasFrameworks = Array.isArray(inspection.frameworks) && inspection.frameworks.length > 0;
-
-  return hasPermissionKeys || hasFrameworks ? 'BINARY_SCAN' : 'BINARY_SCAN';
+  return 'BINARY_SCAN';
 }
 
 const STORAGE_KEYS = {
@@ -488,7 +496,7 @@ class AppStore {
         this.auditsMap[id] = [initialAudit];
       }
       const aiResult = await apiClient.enhanceAuditWithAI(inspection, initialAudit.findings);
-      if (!data.auditRun && aiResult && aiResult.enhancedFindings) {
+      if (aiResult?.aiEnhanced === true && aiResult.enhancedFindings) {
         initialAudit.findings = aiResult.enhancedFindings;
         initialAudit.summary = aiResult.executiveSummary || initialAudit.summary;
         initialAudit.reviewerNotesDraft = aiResult.reviewerNotes || initialAudit.reviewerNotesDraft;
@@ -741,13 +749,13 @@ class AppStore {
       build,
       version,
       existingFindings,
-      resolvedAuditType === 'LISTING_SCAN',
+      resolvedAuditType === 'LISTING_SCAN' || resolvedAuditType === 'CONNECT_SCAN',
       resolvedAuditType
     );
 
     try {
       const aiResult = await apiClient.enhanceAuditWithAI(inspection, newAudit.findings);
-      if (aiResult && aiResult.enhancedFindings) {
+      if (aiResult?.aiEnhanced === true && aiResult.enhancedFindings) {
         newAudit.findings = aiResult.enhancedFindings;
         newAudit.summary = aiResult.executiveSummary || newAudit.summary;
         newAudit.reviewerNotesDraft = aiResult.reviewerNotes || newAudit.reviewerNotesDraft;

@@ -23,6 +23,7 @@ Thumbs.db
 .windsurf
 .env.*
 *.env
+!.env.example
 credentials.json
 *.pem
 *.key

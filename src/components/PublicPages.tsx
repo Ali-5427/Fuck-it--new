@@ -293,7 +293,7 @@ const pages: Record<LegalPage, { title: string; lastUpdated: string; intro: stri
             <p>Fixit uses the following categories of sub-processors to deliver its service:</p>
             <ul>
               <li><strong>Cloud Infrastructure:</strong> Hosting, database, and storage providers (e.g., InsForge, Google Cloud Platform).</li>
-              <li><strong>Payment Processing:</strong> Stripe, Inc. for secure billing.</li>
+              <li><strong>Payment Processing:</strong> Billing is not enabled and no payment processor is connected.</li>
               <li><strong>Error Monitoring:</strong> Application performance and error tracking providers.</li>
               <li><strong>Email Delivery:</strong> Transactional email service providers.</li>
             </ul>

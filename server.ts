@@ -1,8 +1,5 @@
 import express, { Request, Response } from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 import { 
   enhanceAuditWithAI, 
   analyzeAppleRejectionWithAI, 
@@ -36,9 +33,6 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT', err);
 });
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 interface RateLimitRecord {
   count: number;
@@ -613,33 +607,8 @@ export function createServerApp() {
   return app;
 }
 
-export async function startServer() {
-  const app = createServerApp();
-  const PORT = 3000;
-
-  // Mount Vite middleware in development mode
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.resolve('dist');
-    app.use(express.static(distPath));
-    app.get(/^\/(?!api(?:\/|$)).*$/, (req: Request, res: Response) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Fixit server running on http://localhost:${PORT}`);
-  });
-}
-
-// Only start when run directly via node / tsx
-if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-  startServer().catch((err) => {
+if (process.argv.some(arg => /(?:^|[\\/])server\.ts$/.test(arg))) {
+  import('./devServer.js').then(({ startServer }) => startServer()).catch((err) => {
     console.error('Failed to start server:', err);
   });
 }

@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS apps (
 ALTER TABLE apps ENABLE ROW LEVEL SECURITY;
 
 -- Create policy for apps
+DROP POLICY IF EXISTS "Users can manage their own apps" ON apps;
 CREATE POLICY "Users can manage their own apps" 
 ON apps 
 FOR ALL 
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS audits (
 ALTER TABLE audits ENABLE ROW LEVEL SECURITY;
 
 -- Create policy for audits
+DROP POLICY IF EXISTS "Users can manage audits of their own apps" ON audits;
 CREATE POLICY "Users can manage audits of their own apps" 
 ON audits 
 FOR ALL 
@@ -97,6 +99,7 @@ CREATE TABLE IF NOT EXISTS app_store_connect_keys (
 ALTER TABLE app_store_connect_keys ENABLE ROW LEVEL SECURITY;
 
 -- Create policy for app_store_connect_keys
+DROP POLICY IF EXISTS "Users can manage their own App Store Connect keys" ON app_store_connect_keys;
 CREATE POLICY "Users can manage their own App Store Connect keys" 
 ON app_store_connect_keys 
 FOR ALL 
