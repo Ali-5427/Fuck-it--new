@@ -534,6 +534,5 @@ export const AuditView: React.FC<AuditViewProps> = ({
 
     </div>
     </div>
-    </div>
   );
 };
