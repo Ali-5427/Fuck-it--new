@@ -17,7 +17,7 @@ const FindingDetailModal = lazy(() => import('./components/FindingDetailModal').
 const AuditDiffModal = lazy(() => import('./components/AuditDiffModal').then(m => ({ default: m.AuditDiffModal })));
 const SubmissionReportModal = lazy(() => import('./components/SubmissionReportModal').then(m => ({ default: m.SubmissionReportModal })));
 const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
-const AccountModal = lazy(() => import('./components/AccountModal').then(m => ({ default: m.AccountModal })));
+const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
 const ReviewChecklist = lazy(() => import('./components/ReviewChecklist').then(m => ({ default: m.ReviewChecklist })));
 const PrivacyStringsModal = lazy(() => import('./components/PrivacyStringsModal').then(m => ({ default: m.PrivacyStringsModal })));
 const StatusPageModal = lazy(() => import('./components/StatusPageModal').then(m => ({ default: m.StatusPageModal })));
@@ -37,7 +37,7 @@ const ViewLoadingFallback = () => (
 
 export default function App() {
   const [, setTick] = useState(0);
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist'>(() => {
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings'>(() => {
     return store.getUser() ? 'dashboard' : 'landing';
   });
 
@@ -75,7 +75,6 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [authModalTier, setAuthModalTier] = useState<'free' | 'pro' | 'studio'>('pro');
-  const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [activeDiffComparison, setActiveDiffComparison] = useState<AuditComparison | null>(null);
   const [submissionReport, setSubmissionReport] = useState<SubmissionReport | null>(null);
@@ -155,7 +154,7 @@ export default function App() {
 
   const handleOpenAuth = (mode: 'login' | 'register' | 'forgot' = 'login', tier: 'free' | 'pro' | 'studio' = 'pro') => {
     if (user) {
-      setAccountModalOpen(true);
+      setCurrentView('settings');
       return;
     }
     setAuthModalMode(mode);
@@ -212,7 +211,6 @@ export default function App() {
     store.selectApp(app.id);
     const actualAudit = store.getLatestAudit(app.id);
     if (actualAudit) store.setActiveAudit(actualAudit.id);
-    setAccountModalOpen(false);
     setCurrentView('audit');
   };
 
@@ -235,7 +233,7 @@ export default function App() {
           currentView={currentView}
           onNavigate={(v) => setCurrentView(v)}
           onOpenUpload={() => setUploadModalOpen(true)}
-          onOpenAccount={() => setAccountModalOpen(true)}
+          onOpenAccount={() => setCurrentView('settings')}
           onOpenChecklist={() => setChecklistModalOpen(true)}
           user={user}
           apps={apps}
@@ -320,6 +318,17 @@ export default function App() {
                 <ReviewChecklist />
               </Suspense>
             )}
+
+            {currentView === 'settings' && (
+              <Suspense fallback={<ViewLoadingFallback />}>
+                <SettingsView 
+                  user={user}
+                  onOpenAuth={() => handleOpenAuth('login')}
+                  onAuditApp={handleConnectAuditCompleted}
+                  onNavigate={(v) => setCurrentView(v)}
+                />
+              </Suspense>
+            )}
           </main>
 
 
@@ -371,16 +380,6 @@ export default function App() {
             initialMode={authModalMode}
             initialTier={authModalTier}
             onSuccess={() => setCurrentView('dashboard')}
-          />
-        )}
-
-        {accountModalOpen && (
-          <AccountModal
-            isOpen={accountModalOpen}
-            onClose={() => setAccountModalOpen(false)}
-            user={user}
-            onOpenAuth={() => handleOpenAuth('login')}
-            onAuditApp={handleConnectAuditCompleted}
           />
         )}
 
@@ -532,7 +531,7 @@ export default function App() {
         onNavigate={(v) => setCurrentView(v)}
         onOpenUpload={handleLandingStartAudit}
         onOpenAuth={handleOpenAuth}
-        onOpenAccount={() => setAccountModalOpen(true)}
+        onOpenAccount={() => setCurrentView('settings')}
         user={user}
         selectedApp={selectedApp}
         apps={apps}
@@ -579,15 +578,7 @@ export default function App() {
           />
         )}
 
-        {accountModalOpen && (
-          <AccountModal
-            isOpen={accountModalOpen}
-            onClose={() => setAccountModalOpen(false)}
-            user={user}
-            onOpenAuth={() => handleOpenAuth('login')}
-            onAuditApp={handleConnectAuditCompleted}
-          />
-        )}
+
 
         {checklistModalOpen && (
           <ReviewChecklist

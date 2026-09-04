@@ -25,24 +25,19 @@ import { authService } from '../services/authService';
 import { User } from '../types';
 import { apiClient } from '../services/api';
 import { getTrialDaysRemaining, isTrialActive } from '../utils/trial';
-import { useScrollLock } from '../hooks/useScrollLock';
-
-interface AccountModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface SettingsViewProps {
   user: User | null;
   onOpenAuth: () => void;
   onAuditApp?: (inspection: any, auditRun: any) => void;
+  onNavigate?: (view: 'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings') => void;
 }
 
-export const AccountModal: React.FC<AccountModalProps> = ({
-  isOpen,
-  onClose,
+export const SettingsView: React.FC<SettingsViewProps> = ({
   user,
   onOpenAuth,
-  onAuditApp
+  onAuditApp,
+  onNavigate
 }) => {
-  useScrollLock(isOpen);
   const [activeTab, setActiveTab] = useState<'profile' | 'subscription' | 'api' | 'preferences' | 'connections'>('profile');
   
   // Profile form state
@@ -163,7 +158,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({
     }
   };
 
-  if (!isOpen || !user) return null;
+  if (!user) return null;
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,18 +206,18 @@ export const AccountModal: React.FC<AccountModalProps> = ({
   const sessionToken = user.token || '';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="w-full h-full bg-slate-50/50 flex flex-col p-6 overflow-hidden">
+      <div className="max-w-4xl w-full mx-auto flex-1 flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-0">
         
-        {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50/50">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-sm shadow-xs">
               {user.name.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-slate-900 text-base leading-tight font-mono">{user.name}</h3>
+                <h1 className="font-bold text-slate-900 text-lg leading-tight font-mono">Account Settings</h1>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase tracking-wider ${
                   currentTier === 'studio' 
                     ? 'bg-purple-100 text-purple-800 border border-purple-200' 
@@ -235,17 +230,9 @@ export const AccountModal: React.FC<AccountModalProps> = ({
                     : currentTier === 'free' ? 'STARTER' : currentTier.toUpperCase()}
                 </span>
               </div>
-              <p className="text-xs text-slate-500">{user.email} • Apple Team: <span className="font-mono text-slate-700">{user.appleTeamId || 'APEX892K9L'}</span></p>
+              <p className="text-xs text-slate-500 mt-0.5">{user.email} • Apple Team: <span className="font-mono text-slate-700 font-semibold">{user.appleTeamId || 'APEX892K9L'}</span></p>
             </div>
           </div>
-
-          <button
-            id="account_modal_close_btn"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors cursor-pointer"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         {/* Tab Navigation */}
