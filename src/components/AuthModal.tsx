@@ -47,10 +47,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  // OTP verification step (after registration when email verification is required)
-  const [needsOtp, setNeedsOtp] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [pendingRegEmail, setPendingRegEmail] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -58,9 +54,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setTier(initialTier);
       setErrorMsg(null);
       setMsg(null);
-      setNeedsOtp(false);
-      setOtp('');
-      setPendingRegEmail('');
     }
   }, [isOpen, initialMode, initialTier]);
 
@@ -83,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (!email) throw new Error('Please enter your email.');
         if (!password || password.length < 6) throw new Error('Password must be at least 6 characters.');
         const regName = name || (email ? email.split('@')[0] : 'iOS Developer');
-        const result = await authService.registerWithEmail(
+        await authService.registerWithEmail(
           email, 
           password, 
           regName, 
@@ -91,15 +84,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           appleTeamId || 'DEV' + Math.random().toString(36).substring(2, 8).toUpperCase(), 
           teamName || 'Indie Studio'
         );
-        // If registration requires email verification (OTP code), show the OTP step
-        if (result === 'needs_verification') {
-          setPendingRegEmail(email);
-          setNeedsOtp(true);
-          setMsg(`A 6-digit verification code was sent to ${email}. Enter it below.`);
-        } else {
-          if (onSuccess) onSuccess();
-          onClose();
-        }
+        if (onSuccess) onSuccess();
+        onClose();
       } else if (mode === 'forgot') {
         if (!email) throw new Error('Please enter your registered email address.');
         await authService.sendPasswordReset(email);
@@ -116,26 +102,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         message = 'Password must be at least 6 characters.';
       }
       setErrorMsg(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOtpVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp || otp.length < 6) {
-      setErrorMsg('Please enter the 6-digit code sent to your email.');
-      return;
-    }
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      await authService.verifyEmailOtp(pendingRegEmail, otp);
-      if (onSuccess) onSuccess();
-      onClose();
-    } catch (err: any) {
-      console.error('OTP verification error:', err);
-      setErrorMsg(err.message || 'Invalid or expired code. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -196,53 +162,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <X className="h-5 w-5" />
           </button>
         </div>
-
-        {/* OTP Verification Step (after registration) */}
-        {needsOtp ? (
-          <form onSubmit={handleOtpVerify} className="space-y-4">
-            <div className="text-center space-y-1">
-              <p className="text-sm font-semibold text-slate-800">Check your email</p>
-              <p className="text-xs text-slate-500">We sent a 6-digit code to <span className="font-semibold text-slate-700">{pendingRegEmail}</span></p>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Verification Code</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="000000"
-                className="w-full text-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-lg font-mono tracking-widest text-slate-900 focus:border-blue-500 focus:outline-none"
-                autoFocus
-              />
-            </div>
-            {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">{errorMsg}</div>
-            )}
-            {msg && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>{msg}</span>
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={isLoading || otp.length < 6}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all font-mono cursor-pointer"
-            >
-              <span>{isLoading ? 'Verifying...' : 'Verify & Continue'}</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => { setNeedsOtp(false); setOtp(''); setMsg(null); setErrorMsg(null); }}
-              className="w-full text-center text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
-            >
-              ← Back to sign up
-            </button>
-          </form>
-        ) : (
 
         {/* Google SSO */}
         <div className="space-y-3">
@@ -432,8 +351,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </span>
           )}
         </div>
-
-        )} {/* end needsOtp ternary */}
 
       </div>
     </div>
