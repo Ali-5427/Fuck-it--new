@@ -146,7 +146,7 @@ export class AuthService {
     tier: 'free' | 'pro' | 'studio' = 'pro',
     appleTeamId?: string,
     teamName?: string
-  ): Promise<User> {
+  ): Promise<User | 'needs_verification'> {
     const { data: regData, error: regError } = await insforge.auth.signUp({
       email,
       password: pass,
@@ -155,6 +155,11 @@ export class AuthService {
     if (regError) throw regError;
     const insUser = regData?.user;
     if (!insUser) throw new Error('Registration failed.');
+
+    // InsForge requires email verification — signal the UI to show OTP input
+    if (regData?.requireEmailVerification) {
+      return 'needs_verification';
+    }
 
     const trialEndsAt = new Date(Date.now() + 30*24*60*60*1000).toISOString();
 
@@ -193,6 +198,18 @@ export class AuthService {
     });
     if (profileError) throw profileError;
 
+    this.currentUser = appUser;
+    store.setUser(appUser);
+    return appUser;
+  }
+
+  // Verify email with OTP code (called after registration when requireEmailVerification=true)
+  public async verifyEmailOtp(email: string, otp: string): Promise<User> {
+    const { data, error } = await insforge.auth.verifyEmail({ email, otp });
+    if (error) throw error;
+    const insUser = data?.user;
+    if (!insUser) throw new Error('Verification failed.');
+    const appUser = await this.fetchAndSyncUserProfile(insUser);
     this.currentUser = appUser;
     store.setUser(appUser);
     return appUser;
