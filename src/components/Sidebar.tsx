@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  LayoutDashboard, 
-  Smartphone, 
-  RotateCw, 
-  MessageSquareWarning, 
+  ShieldCheck, 
   Settings, 
   LogOut, 
   Plus, 
-  ShieldCheck, 
-  CheckCircle2, 
   ChevronRight,
   Menu,
-  X,
-  FileCheck2,
-  HelpCircle,
-  FileText
+  X
 } from 'lucide-react';
 import { store } from '../services/store';
 import { authService } from '../services/authService';
@@ -23,7 +15,7 @@ import { useScrollLock } from '../hooks/useScrollLock';
 
 interface SidebarProps {
   currentView: string;
-  onNavigate: (view: 'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist') => void;
+  onNavigate: (view: 'landing' | 'preflight' | 'preflight-app' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings') => void;
   onOpenUpload: () => void;
   onOpenAccount: () => void;
   onOpenChecklist?: () => void;
@@ -55,25 +47,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onNavigate('landing');
   };
 
+  // Only Preflight + Account are linked here on purpose. The old My Apps /
+  // Fix a Rejection / Final Checklist views still exist in the repo — they're
+  // just not part of the new product's nav (see Sidebar in BUILD ORDER notes).
   const navItems = [
     {
-      id: 'dashboard',
-      label: 'My Apps',
-      icon: LayoutDashboard,
-      view: 'dashboard' as const,
+      id: 'preflight',
+      label: 'Preflight',
+      icon: ShieldCheck,
+      view: 'preflight' as const,
       badge: apps.length > 0 ? String(apps.length) : undefined
     },
     {
-      id: 'rejection',
-      label: 'Fix a Rejection',
-      icon: MessageSquareWarning,
-      view: 'rejection' as const
-    },
-    {
-      id: 'checklist',
-      label: 'Final Checklist',
-      icon: FileCheck2,
-      view: 'checklist' as const
+      id: 'settings',
+      label: 'Account',
+      icon: Settings,
+      view: 'settings' as const
     }
   ];
 
@@ -133,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex h-16 items-center justify-between px-5 border-b border-slate-100 shrink-0">
           <button
             onClick={() => {
-              onNavigate('dashboard');
+              onNavigate('preflight');
               setIsMobileOpen(false);
             }}
             className="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-none"
@@ -224,14 +213,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div className="space-y-0.5">
                 {apps.slice(0, 5).map((app) => {
-                  const isSelected = selectedApp?.id === app.id && currentView === 'audit';
+                  const isSelected = selectedApp?.id === app.id && currentView === 'preflight-app';
                   return (
                     <button
                       key={app.id}
                       id={`sidebar_app_${app.id}`}
                       onClick={() => {
                         store.selectApp(app.id);
-                        onNavigate('audit');
+                        onNavigate('preflight-app');
                         setIsMobileOpen(false);
                       }}
                       className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors cursor-pointer group text-left ${

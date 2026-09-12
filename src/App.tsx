@@ -5,6 +5,8 @@ import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { AuditView } from './components/AuditView';
 import { SiteFooter } from './components/SiteFooter';
+import { PreflightHome } from './preflight/PreflightHome';
+import { PreflightApp } from './preflight/PreflightApp';
 
 // Lazy-loaded secondary views & modals
 const RejectionAnalyzer = lazy(() => import('./components/RejectionAnalyzer').then(m => ({ default: m.RejectionAnalyzer })));
@@ -37,8 +39,8 @@ const ViewLoadingFallback = () => (
 
 export default function App() {
   const [, setTick] = useState(0);
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings'>(() => {
-    return store.getUser() ? 'dashboard' : 'landing';
+  const [currentView, setCurrentView] = useState<'landing' | 'preflight' | 'preflight-app' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings'>(() => {
+    return store.getUser() ? 'preflight' : 'landing';
   });
 
   // Subscribe to store updates
@@ -49,7 +51,7 @@ export default function App() {
       if (!currentUser && currentView !== 'landing') {
         setCurrentView('landing');
       } else if (currentUser && currentView === 'landing') {
-        setCurrentView('dashboard');
+        setCurrentView('preflight');
       }
     });
     return unsubscribe;
@@ -61,7 +63,7 @@ export default function App() {
   // Guard against non-admin accessing admin view
   useEffect(() => {
     if (currentView === 'admin' && !isAdminUser) {
-      setCurrentView('dashboard');
+      setCurrentView('preflight');
     }
   }, [currentView, isAdminUser]);
   const apps = store.getApps();
@@ -189,7 +191,7 @@ export default function App() {
   const handleAuditCompleted = (appId: string, auditId: string, comparison?: any) => {
     store.selectApp(appId);
     store.setActiveAudit(auditId);
-    setCurrentView('audit');
+    setCurrentView('preflight-app');
     if (comparison) {
       setActiveDiffComparison(comparison);
     }
@@ -242,7 +244,22 @@ export default function App() {
 
         {/* Main Content Pane */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden">
-          <main className="flex-1 overflow-hidden h-full min-h-0">
+          <main className="flex-1 overflow-hidden h-full min-h-0 overflow-y-auto">
+            {currentView === 'preflight' && (
+              <PreflightHome
+                onOpenApp={appId => {
+                  store.selectApp(appId);
+                  setCurrentView('preflight-app');
+                }}
+              />
+            )}
+
+            {currentView === 'preflight-app' && selectedApp && (
+              <PreflightApp app={selectedApp} onBack={() => setCurrentView('preflight')} />
+            )}
+
+            {/* Legacy escape — old dashboard is not in nav, but stays reachable
+                here for maintainers so nothing is deleted. */}
             {currentView === 'dashboard' && (
               <Dashboard
                 user={user}
@@ -379,7 +396,7 @@ export default function App() {
             onClose={() => setAuthModalOpen(false)}
             initialMode={authModalMode}
             initialTier={authModalTier}
-            onSuccess={() => setCurrentView('dashboard')}
+            onSuccess={() => setCurrentView('preflight')}
           />
         )}
 
@@ -513,7 +530,7 @@ export default function App() {
               onClose={() => setAuthModalOpen(false)}
               initialMode={authModalMode}
               initialTier={authModalTier}
-              onSuccess={() => setCurrentView('dashboard')}
+              onSuccess={() => setCurrentView('preflight')}
             />
           )}
         </Suspense>
@@ -574,7 +591,7 @@ export default function App() {
             onClose={() => setAuthModalOpen(false)}
             initialMode={authModalMode}
             initialTier={authModalTier}
-            onSuccess={() => setCurrentView('dashboard')}
+            onSuccess={() => setCurrentView('preflight')}
           />
         )}
 
