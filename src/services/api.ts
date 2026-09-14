@@ -43,6 +43,20 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
 }
 
 export const apiClient = {
+  async searchItunes(term: string) {
+    const res = await fetchWithTimeout('/api/itunes-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ term })
+    }, 10000);
+    
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to search App Store');
+    }
+    return res.json();
+  },
+
   async healthCheck() {
     const res = await fetchWithTimeout('/api/health', {}, 5000);
     if (!res.ok) throw new Error('Health check failed');

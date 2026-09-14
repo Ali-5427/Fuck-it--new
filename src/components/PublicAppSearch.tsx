@@ -32,11 +32,8 @@ export function PublicAppSearch() {
     setHasSearched(true);
     
     try {
-      const response = await apiClient.post('/api/itunes-search', { term: searchTerm });
-      if (!response.ok) {
-        throw new Error(response.error || 'Failed to search App Store');
-      }
-      setResults(response.data.results || []);
+      const response = await apiClient.searchItunes(searchTerm);
+      setResults(response.results || []);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'An error occurred while searching. Please try again.');
