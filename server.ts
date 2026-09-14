@@ -214,6 +214,48 @@ export function createServerApp() {
     }
   });
 
+  app.post('/api/itunes-search', rateLimiter, async (req: Request, res: Response) => {
+    const { term } = req.body;
+    if (typeof term !== 'string' || term.trim() === '') {
+      return res.status(400).json({ error: 'Please enter a search term.' });
+    }
+
+    try {
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=software&limit=25`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        return res.status(response.status).json({ error: 'Failed to fetch from iTunes API' });
+      }
+
+      const data = await response.json();
+      
+      const results = (data.results || []).map((app: any) => ({
+        trackId: app.trackId,
+        trackName: app.trackName,
+        artistName: app.artistName,
+        primaryGenreName: app.primaryGenreName,
+        artworkUrl512: app.artworkUrl512 || app.artworkUrl100,
+        averageUserRating: app.averageUserRating,
+        userRatingCount: app.userRatingCount,
+        bundleId: app.bundleId,
+        version: app.version,
+        formattedPrice: app.formattedPrice
+      }));
+
+      res.json({ results });
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return res.status(503).json({ error: "Couldn't reach the App Store right now, try again in a moment." });
+      }
+      res.status(500).json({ error: err.message || 'Search failed' });
+    }
+  });
+
   app.post('/api/try-now', rateLimiter, async (req: Request, res: Response) => {
     const { query } = req.body;
     if (typeof query !== 'string' || query.trim() === '') {

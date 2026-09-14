@@ -9,8 +9,8 @@ import { store } from '../services/store';
 import { Application, User } from '../types';
 
 interface NavbarProps {
-  currentView: 'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy';
-  onNavigate: (view: 'landing' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy') => void;
+  currentView: string;
+  onNavigate: (view: string) => void;
   onOpenUpload: () => void;
   onOpenAuth: (mode?: 'login' | 'register', tier?: 'free' | 'pro' | 'studio') => void;
   onOpenAccount?: () => void;
@@ -109,9 +109,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   Rejection Solver
                 </button>
+                <button
+                  id="nav_link_search"
+                  onClick={() => onNavigate('search')}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                    currentView === 'search'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                  }`}
+                >
+                  App Search
+                </button>
               </>
             ) : (
               <>
+                <button
+                  id="nav_link_search_public"
+                  onClick={() => onNavigate('search')}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                    currentView === 'search'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                  }`}
+                >
+                  App Search
+                </button>
                 <button
                   id="nav_link_product"
                   onClick={() => scrollToLandingSection('product-showcase')}
@@ -238,6 +260,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <button
                 onClick={() => {
+                  onNavigate('search');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-left text-slate-700 hover:bg-slate-100"
+              >
+                App Search
+              </button>
+
+              <button
+                onClick={() => {
                   onOpenUpload();
                   setMobileMenuOpen(false);
                 }}
@@ -248,6 +280,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </>
           ) : (
             <>
+              <button
+                onClick={() => {
+                  onNavigate('search');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-left text-slate-700 hover:bg-slate-100"
+              >
+                App Search
+              </button>
               <button
                 onClick={() => scrollToLandingSection('product-showcase')}
                 className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-left text-slate-700 hover:bg-slate-100"

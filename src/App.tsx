@@ -24,6 +24,7 @@ const ReviewChecklist = lazy(() => import('./components/ReviewChecklist').then(m
 const PrivacyStringsModal = lazy(() => import('./components/PrivacyStringsModal').then(m => ({ default: m.PrivacyStringsModal })));
 const StatusPageModal = lazy(() => import('./components/StatusPageModal').then(m => ({ default: m.StatusPageModal })));
 const SupportModal = lazy(() => import('./components/SupportModal').then(m => ({ default: m.SupportModal })));
+const PublicAppSearch = lazy(() => import('./components/PublicAppSearch').then(m => ({ default: m.PublicAppSearch })));
 
 import { store } from './services/store';
 import { apiClient } from './services/api';
@@ -39,7 +40,7 @@ const ViewLoadingFallback = () => (
 
 export default function App() {
   const [, setTick] = useState(0);
-  const [currentView, setCurrentView] = useState<'landing' | 'preflight' | 'preflight-app' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings'>(() => {
+  const [currentView, setCurrentView] = useState<'landing' | 'search' | 'preflight' | 'preflight-app' | 'dashboard' | 'audit' | 'rejection' | 'metadata' | 'screenshots' | 'admin' | 'privacy' | 'checklist' | 'settings'>(() => {
     return store.getUser() ? 'preflight' : 'landing';
   });
 
@@ -48,9 +49,9 @@ export default function App() {
     const unsubscribe = store.subscribe(() => {
       setTick(t => t + 1);
       const currentUser = store.getUser();
-      if (!currentUser && currentView !== 'landing') {
+      if (!currentUser && currentView !== 'landing' && currentView !== 'search') {
         setCurrentView('landing');
-      } else if (currentUser && currentView === 'landing') {
+      } else if (currentUser && (currentView === 'landing' || currentView === 'search')) {
         setCurrentView('preflight');
       }
     });
@@ -245,6 +246,12 @@ export default function App() {
         {/* Main Content Pane */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden">
           <main className="flex-1 overflow-hidden h-full min-h-0 overflow-y-auto">
+            {currentView === 'search' && (
+              <Suspense fallback={<ViewLoadingFallback />}>
+                <PublicAppSearch />
+              </Suspense>
+            )}
+
             {currentView === 'preflight' && (
               <PreflightHome
                 onOpenApp={appId => {
@@ -556,19 +563,25 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 min-h-0 overflow-y-auto">
-        <LandingPage
-          onStartAudit={handleLandingStartAudit}
-          onExploreDemo={handleLandingExploreDemo}
-          onOpenRejectionAnalyzer={handleLandingRejectionAnalyzer}
-          onOpenAuth={handleOpenAuth}
-          onOpenChecklist={() => user ? setChecklistModalOpen(true) : handleOpenAuth('register')}
-          onOpenPrivacyStrings={() => user ? setPrivacyStringsModalOpen(true) : handleOpenAuth('register')}
-          onOpenStatus={() => user ? setStatusModalOpen(true) : handleOpenAuth('register')}
-          onOpenSupport={() => user ? setSupportModalOpen(true) : handleOpenAuth('register')}
-          onTryNow={handleTryNow}
-          tryNowError={tryNowError}
-          isTryNowLoading={tryNowLoading}
-        />
+        <Suspense fallback={<ViewLoadingFallback />}>
+          {currentView === 'search' ? (
+            <PublicAppSearch />
+          ) : (
+            <LandingPage
+              onStartAudit={handleLandingStartAudit}
+              onExploreDemo={handleLandingExploreDemo}
+              onOpenRejectionAnalyzer={handleLandingRejectionAnalyzer}
+              onOpenAuth={handleOpenAuth}
+              onOpenChecklist={() => user ? setChecklistModalOpen(true) : handleOpenAuth('register')}
+              onOpenPrivacyStrings={() => user ? setPrivacyStringsModalOpen(true) : handleOpenAuth('register')}
+              onOpenStatus={() => user ? setStatusModalOpen(true) : handleOpenAuth('register')}
+              onOpenSupport={() => user ? setSupportModalOpen(true) : handleOpenAuth('register')}
+              onTryNow={handleTryNow}
+              tryNowError={tryNowError}
+              isTryNowLoading={tryNowLoading}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* Modals */}
