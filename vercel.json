@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/index.cjs": {
+    "api/index.ts": {
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api/index.cjs"
+      "destination": "/api"
     },
     {
       "source": "/((?!api(?:/|$)).*)",
