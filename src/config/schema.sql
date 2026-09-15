@@ -85,6 +85,59 @@ ALTER TABLE apps ADD COLUMN IF NOT EXISTS inspection JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE audits ADD COLUMN IF NOT EXISTS audit_type TEXT;
 ALTER TABLE audits ADD COLUMN IF NOT EXISTS inspection JSONB DEFAULT '{}'::jsonb;
 
+-- Realtime: broadcast changes to the owning user's workspace.
+INSERT INTO realtime.channels (pattern, description, enabled)
+VALUES ('user:%', 'Fixit workspace changes by user', true)
+ON CONFLICT (pattern) DO UPDATE SET enabled = EXCLUDED.enabled;
+
+CREATE OR REPLACE FUNCTION notify_fixit_app_change()
+RETURNS TRIGGER AS $$
+DECLARE
+  owner_id UUID;
+BEGIN
+  owner_id := COALESCE(NEW.user_id, OLD.user_id);
+  PERFORM realtime.publish(
+    'user:' || owner_id::text,
+    'data_changed',
+    jsonb_build_object('table', TG_TABLE_NAME, 'operation', TG_OP)
+  );
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION notify_fixit_audit_change()
+RETURNS TRIGGER AS $$
+DECLARE
+  owner_id UUID;
+BEGIN
+  SELECT user_id INTO owner_id
+  FROM apps
+  WHERE id = COALESCE(NEW.app_id, OLD.app_id);
+  PERFORM realtime.publish(
+    'user:' || owner_id::text,
+    'data_changed',
+    jsonb_build_object('table', TG_TABLE_NAME, 'operation', TG_OP)
+  );
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS apps_realtime_change ON apps;
+CREATE TRIGGER apps_realtime_change
+AFTER INSERT OR UPDATE OR DELETE ON apps
+FOR EACH ROW EXECUTE FUNCTION notify_fixit_app_change();
+
+DROP TRIGGER IF EXISTS audits_realtime_change ON audits;
+CREATE TRIGGER audits_realtime_change
+AFTER INSERT OR UPDATE OR DELETE ON audits
+FOR EACH ROW EXECUTE FUNCTION notify_fixit_audit_change();
+
 -- Create app_store_connect_keys table
 CREATE TABLE IF NOT EXISTS app_store_connect_keys (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,

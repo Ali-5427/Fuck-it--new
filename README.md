@@ -14,7 +14,7 @@ Fix It inspects an iOS build, App Store listing, or App Store Connect record and
 
 ### Run locally
 
-```bash
+```bas
 npm install
 cp .env.example .env.local
 npm run dev

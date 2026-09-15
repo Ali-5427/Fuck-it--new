@@ -68,6 +68,8 @@ class AppStore {
   private listeners: Set<() => void> = new Set();
   private isSyncing = false;
   private lastPersistError: string | null = null;
+  private realtimeChannel: string | null = null;
+  private realtimeChangeHandler: ((message: { channel?: string }) => void) | null = null;
 
   constructor() {
     this.init();
@@ -106,6 +108,7 @@ class AppStore {
 
       if (this.user) {
         this.syncFromDatabase();
+        this.connectRealtime(this.user.id);
       }
     } catch (e) {
       console.error('Error loading store state:', e);
@@ -224,6 +227,45 @@ class AppStore {
     } finally {
       this.isSyncing = false;
     }
+  }
+
+  private async connectRealtime(userId: string) {
+    const channel = `user:${userId}`;
+    if (this.realtimeChannel === channel) return;
+
+    this.disconnectRealtime();
+    this.realtimeChannel = channel;
+    this.realtimeChangeHandler = () => {
+      void this.syncFromDatabase();
+    };
+
+    insforge.realtime.on('data_changed', this.realtimeChangeHandler);
+
+    try {
+      await insforge.realtime.connect();
+      const response = await insforge.realtime.subscribe(channel);
+      if (!response.ok) {
+        throw new Error(response.error.message);
+      }
+    } catch (err) {
+      console.warn('InsForge realtime connection warning:', err);
+      if (this.realtimeChangeHandler) {
+        insforge.realtime.off('data_changed', this.realtimeChangeHandler);
+      }
+      this.realtimeChannel = null;
+      this.realtimeChangeHandler = null;
+    }
+  }
+
+  private disconnectRealtime() {
+    if (this.realtimeChangeHandler) {
+      insforge.realtime.off('data_changed', this.realtimeChangeHandler);
+    }
+    if (this.realtimeChannel) {
+      insforge.realtime.unsubscribe(this.realtimeChannel);
+    }
+    this.realtimeChannel = null;
+    this.realtimeChangeHandler = null;
   }
 
   private migrateAudits(raw: Record<string, AuditRun[]>): Record<string, AuditRun[]> {
@@ -362,6 +404,7 @@ class AppStore {
     const prevUser = this.user;
     this.user = user;
     if (!user) {
+      this.disconnectRealtime();
       // On sign-out, drop user AND that user's cached workspace
       this.apps = [];
       this.auditsMap = {};
@@ -372,6 +415,7 @@ class AppStore {
     this.persist();
     if (user && (!prevUser || prevUser.id !== user.id)) {
       this.syncFromDatabase();
+      this.connectRealtime(user.id);
     }
   }
 

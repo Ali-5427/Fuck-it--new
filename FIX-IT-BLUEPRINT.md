@@ -1,1574 +1,3610 @@
-# FIX IT — MASTER END-TO-END BUILD PROMPT
+# FIX IT — MASTER END-TO-END PRODUCT BLUEPRINT
 
-You are now the primary engineer responsible for building **Fix It** from scratch.
-Do not create another implementation plan first.
-Do not stop after describing what you would build.
-**BUILD THE PRODUCT.**
+## 0. DOCUMENT PURPOSE
 
-You may inspect the existing workspace/project only to understand what files already exist, but Fix It is being built as a new product. Do not assume that an existing Fix It implementation is correct or that previous architecture decisions must be preserved.
+This is the master specification for **Fix It**.
 
-If the workspace is empty, initialize the project.
-If files already exist, use them where useful, but replace incorrect architecture or code when necessary.
+It defines:
 
----
+* what Fix It is
+* who it serves
+* the complete user journey
+* the product modules
+* the data model
+* the analysis engine
+* AI behavior
+* screenshot analysis
+* metadata analysis
+* App Store Connect integration
+* monitoring
+* rejection handling
+* fix verification
+* history and memory
+* notifications
+* reports
+* security
+* architecture
+* UI behavior
+* testing
+* development order
+* rules an AI coding agent must never violate
 
-## 1. PRODUCT
-**Product name**: Fix It
+This document is the source of truth for the product.
 
-**Core promise**: Check your app before you submit it.
+The objective is not to build a collection of disconnected tools.
 
-Fix It is a developer tool that helps iOS developers check their apps before App Store submission, understand problems, fix them, recheck them, and monitor their App Store Connect status.
-
-The customer is building an iOS app.
-**Fix It itself is NOT an iOS app.**
-
----
-
-## 2. ABSOLUTE PLATFORM REQUIREMENT
-**FIX IT IS A WEB APPLICATION ONLY.**
-This requirement overrides any conflicting assumption.
-Fix It must run entirely in a web browser.
-
-**DO NOT BUILD:**
-- iOS application
-- Android application
-- native mobile application
-- macOS application
-- Windows application
-- Swift application
-- SwiftUI application
-- Xcode project
-- React Native application
-- Flutter application
-- native desktop client
-
-There must be **ONE WEB APPLICATION**.
-The browser frontend communicates with Supabase and server-side Edge Functions.
-The product can analyze customer iOS app builds, but Fix It itself is always a web application.
+The objective is to build one continuous system that helps an iOS developer move through the entire App Store lifecycle.
 
 ---
 
-## 3. TARGET USERS
-Build for:
-- indie developers
-- solo founders
-- AI-assisted app builders
-- small development teams
-- developers preparing an iOS app for App Store submission
+# 1. PRODUCT IDENTITY
 
-The UI should feel like a serious developer tool.
-It should be simple, clean, fast and understandable.
-Do not build a huge enterprise dashboard.
+## Product
+
+**Fix It**
+
+## Core promise
+
+**Check your app before you submit it.**
+
+## Expanded promise
+
+Fix It helps developers:
+
+**Prepare → Check → Understand → Fix → Recheck → Submit → Monitor → Handle Rejection → Fix Again → Resubmit**
+
+Fix It is not merely:
+
+* an AI chatbot
+* a generic debugging tool
+* an App Store scraper
+* a screenshot analyzer
+* a rejection explainer
+
+It is a lifecycle product centered around **App Store readiness and review problems**.
 
 ---
 
-## 4. CORE USER JOURNEY
-The complete product journey should be:
+# 2. WHO FIX IT IS FOR
+
+Primary users:
+
+* indie iOS developers
+* solo developers
+* solo founders
+* AI-assisted app builders
+* small startups
+* small development teams
+* developers preparing their first App Store submission
+* developers repeatedly shipping updates
+* developers who have already experienced App Review friction
+
+Ideal early customer:
+
+A developer who has built an app and is thinking:
+
+> "I don't want to submit this and discover a problem afterward."
+
+Another ideal customer:
+
+> "Apple rejected me and I don't understand exactly what I need to change."
+
+Another:
+
+> "I fixed the rejection. Is the new build actually clean?"
+
+Another:
+
+> "I don't want to manually keep checking App Store Connect."
+
+Fix It should serve all four situations through the same product.
+
+---
+
+# 3. THE CORE PRODUCT IDEA
+
+The product should be understood as one continuous lifecycle.
 
 ```text
-Visit Fix It
- ↓
-Search for an existing App Store app
- ↓
-See real public app information
- ↓
-See locked Fix It preview
- ↓
-Sign up / Log in
+IDEA / DEVELOPMENT
+        ↓
+APP PREPARATION
+        ↓
+UPLOAD / CONNECT
+        ↓
+PRE-FLIGHT ANALYSIS
+        ↓
+IPA + METADATA + SCREENSHOTS + OTHER INPUTS
+        ↓
+DETERMINISTIC FINDINGS
+        ↓
+AI EXPLANATION
+        ↓
+FIX
+        ↓
+RECHECK
+        ↓
+COMPARE
+        ↓
+READY TO SUBMIT
+        ↓
+APP STORE CONNECT
+        ↓
+SUBMISSION / REVIEW
+        ↓
+      ┌───────────────┐
+      │               │
+   APPROVED        REJECTED
+      │               │
+      ↓               ↓
+   MONITOR      REJECTION ANALYSIS
+                      ↓
+                 FIX CHECKLIST
+                      ↓
+                  NEW BUILD
+                      ↓
+                  RECHECK
+                      ↓
+                   RESCAN
+                      ↓
+                  RESUBMIT
+                      ↓
+                   MONITOR
+                      ↓
+                  APPROVED
+```
+
+This lifecycle is the product.
+
+---
+
+# 4. THE MOST IMPORTANT PRODUCT PRINCIPLE
+
+Fix It must distinguish between:
+
+### FACTS
+
+Facts come from actual sources.
+
+Examples:
+
+* IPA contents
+* Info.plist
+* provisioning profile
+* metadata supplied by user
+* screenshots uploaded by user
+* App Store Connect API
+* App Store public data
+* actual webhook events
+* actual rejection text
+
+### DETERMINISTIC ANALYSIS
+
+The analysis engine decides whether a technically verifiable condition exists.
+
+Example:
+
+```text
+IPA
+↓
+Info.plist
+↓
+NSCameraUsageDescription missing
+↓
+Finding created
+```
+
+The AI does not invent this finding.
+
+### AI INTERPRETATION
+
+AI explains the actual finding.
+
+Example:
+
+```text
+Finding:
+Missing camera usage description
+
+AI:
+What this means
+Why it matters
+What to change
+What to check afterward
+```
+
+### USER ACTION
+
+The developer changes the app.
+
+### VERIFICATION
+
+Fix It analyzes the new state and determines whether the previous issue is actually gone.
+
+This distinction must exist throughout the architecture.
+
+---
+
+# 5. ABSOLUTE NO-FABRICATION RULE
+
+Fix It must never fabricate:
+
+* App Store apps
+* app names
+* developers
+* ratings
+* reviews
+* builds
+* versions
+* Apple statuses
+* TestFlight information
+* analytics
+* findings
+* readiness
+* scores
+* notifications
+* webhook events
+* rejection reasons
+* AI conclusions
+* Apple approval
+* policy compliance
+
+If data does not exist:
+
+show:
+
+* unavailable
+* not connected
+* not checked
+* no data
+* not supported yet
+
+Never replace missing information with fake UI data.
+
+---
+
+# 6. FIX IT IS A WEB APPLICATION
+
+Fix It itself is:
+
+**ONE WEB APPLICATION**
+
+Not:
+
+* iOS app
+* Android app
+* macOS app
+* Windows app
+* Swift application
+* SwiftUI application
+* Xcode project
+* React Native application
+* Flutter application
+* native desktop app
+
+The customer may upload and analyze an iOS build.
+
+Fix It remains a browser-based developer product.
+
+---
+
+# 7. TECHNOLOGY ARCHITECTURE
+
+## Frontend
+
+Use:
+
+* React
+* Vite
+* TypeScript
+* Tailwind CSS
+* React Router
+* TanStack React Query
+* Supabase JavaScript client
+* Lucide icons
+
+Use strict TypeScript.
+
+Do not introduce unnecessary global state libraries.
+
+---
+
+# 8. BACKEND
+
+Use Supabase for the backend.
+
+Components:
+
+* Supabase Auth
+* Supabase PostgreSQL
+* Supabase Storage
+* Supabase Edge Functions
+* Supabase Realtime where useful
+
+Do not introduce additional infrastructure unless a real technical limitation requires it.
+
+Avoid unnecessary:
+
+* custom Node server
+* Express
+* Hono
+* Bun backend
+* Redis
+* Kafka
+* RabbitMQ
+* Kubernetes
+* microservices
+* AWS S3
+* custom authentication
+
+The default architecture should remain simple.
+
+---
+
+# 9. HIGH-LEVEL SYSTEM ARCHITECTURE
+
+```text
+                     FIX IT WEB APP
+                           │
+                           ▼
+                React + Vite + TypeScript
+                           │
+                           ▼
+                      supabase-js
+                           │
+                           ▼
+               ┌─────────────────────┐
+               │      SUPABASE       │
+               │                     │
+               │ Auth                │
+               │ PostgreSQL          │
+               │ Storage             │
+               │ Edge Functions      │
+               │ Realtime             │
+               └─────────────────────┘
+                   │       │      │
+                   │       │      └──── App Store Connect
+                   │       │
+                   │       └────────── Ollama / AI
+                   │
+                   └────────────────── iTunes Search
+```
+
+---
+
+# 10. APPLICATION MODULES
+
+Fix It should be organized around these major modules.
+
+## Module A — Public Experience
+
+* landing page
+* App Store search
+* public app preview
+* locked analysis preview
+
+## Module B — Authentication
+
+* signup
+* login
+* logout
+* session persistence
+* protected routes
+
+## Module C — Workspace
+
+* dashboard
+* My Apps
+* app details
+* history
+* credits
+* notifications
+* settings
+
+## Module D — Preflight Analysis
+
+* IPA upload
+* extraction
+* binary metadata
+* Info.plist inspection
+* permission checks
+* provisioning checks
+* URL checks
+* icon checks
+* localization checks
+* deterministic findings
+* readiness
+
+## Module E — Visual/App Store Material Analysis
+
+* screenshot checking
+* metadata checking
+* review notes checking
+* privacy-related inputs
+* submission material consistency
+
+## Module F — AI Explanation
+
+* finding explanation
+* fix guidance
+* evidence-based reasoning
+* follow-up checks
+* explanation caching
+
+## Module G — Rejection Solver
+
+* rejection input
+* guideline interpretation
+* likely issue
+* suggested changes
+* next steps
+* response generation
+
+## Module H — Recheck and Verification
+
+* new build
+* new scan
+* comparison
+* fixed issues
+* remaining issues
+* new issues
+* fix verification
+
+## Module I — App Store Connect
+
+* credential connection
+* server-side JWT
+* app discovery
+* versions
+* builds
+* metadata
+* TestFlight
+* reviews
+* status
+
+## Module J — Monitoring
+
+* webhooks
+* synchronization
+* change detection
+* notifications
+* activity timeline
+
+## Module K — Reports and History
+
+* reports
+* comparisons
+* review history
+* rejection history
+* app lifecycle history
+
+---
+
+# 11. PUBLIC USER JOURNEY
+
+A visitor arrives at Fix It.
+
+They can:
+
+```text
+Landing page
+    ↓
+Search App Store
+    ↓
+Real Apple public app result
+    ↓
+Open app preview
+    ↓
+See real public information
+    ↓
+See locked Fix It analysis area
+    ↓
+"Sign up to run Fix It on your app."
+```
+
+The locked area must not secretly contain fake scores or analysis.
+
+---
+
+# 12. AUTHENTICATION
+
+Use Supabase Auth.
+
+Support:
+
+* signup
+* login
+* logout
+* session persistence
+* protected routes
+
+Initially:
+
+**email/password**
+
+After authentication:
+
+```text
+User
  ↓
 Dashboard
  ↓
-Add / connect an app
- ↓
-Choose:
- • Upload .ipa
- • Connect App Store Connect
- ↓
-Run preflight
- ↓
-Real deterministic analysis
- ↓
-Findings
- ↓
-Readiness result
- ↓
-AI explains findings
- ↓
-Developer fixes issues
- ↓
-Upload/recheck
- ↓
-Compare previous result
- ↓
-Ready to submit
- ↓
-Connect App Store Connect
- ↓
-Monitor app/build/version/review events
- ↓
-Receive notifications
- ↓
-If rejected:
- rejection event
- ↓
- notification
- ↓
- AI explanation
- ↓
- rejection solver
- ↓
- developer fixes app
- ↓
- preflight again
- ↓
- recheck
- ↓
- resubmit
- ↓
- continue monitoring
+Add app
 ```
-This workflow is the heart of Fix It.
+
+Users must only access their own private information.
 
 ---
 
-## 5. TECHNOLOGY STACK
+# 13. DASHBOARD
 
-**Frontend**
-Use:
-- React
-- Vite
-- TypeScript
-- Tailwind CSS
-- React Router
-- TanStack React Query
-- Supabase JavaScript client
-- Lucide icons
+The dashboard is the command center.
 
-Use strict TypeScript.
-Keep frontend architecture simple.
-Do not introduce unnecessary state-management libraries.
+It should contain:
 
-**Backend**
-Use **Supabase as the backend platform**.
-Use:
-- Supabase Auth
-- Supabase PostgreSQL
-- Supabase Storage
-- Supabase Edge Functions
-- Supabase Realtime where useful
-
-Supabase Edge Functions are server-side TypeScript/Deno functions. Use them for sensitive operations, integrations, webhooks and backend processing.
-
-**Do NOT introduce:**
-- Node backend server
-- Express
-- Hono
-- Bun backend
-- Redis
-- pg-boss
-- Kafka
-- RabbitMQ
-- Kubernetes
-- microservices
-- AWS S3
-- custom authentication backend
-unless a real technical limitation is discovered that makes a specific component absolutely necessary.
-
-Prefer the simplest architecture that actually works.
-
----
-
-## 7. DATABASE
-Create the required Supabase PostgreSQL schema.
-Use UUID primary keys where appropriate.
-Enable Row Level Security on user-owned data.
-
-Core tables should include:
-
-**profiles**
-- id
-- email
-- created_at
-- starting_credits_granted
-
-**credits_ledger**
-- id
-- user_id
-- delta
-- reason
-- reference_id
-- created_at
-*(Balance should be calculated from ledger entries rather than relying on a drifting manually updated balance.)*
-
-**apps**
-- id
-- user_id
-- name
-- icon_url
-- bundle_id
-- source
-- itunes_track_id
-- created_at
-- updated_at
-
-**asc_connections**
-- id
-- user_id
-- issuer_id
-- key_id
-- encrypted_private_key
-- status
-- validated_at
-- last_error
-- webhook_secret
-- created_at
-*(Sensitive credentials must never be exposed to the browser after submission.)*
-
-**connected_apps**
-- id
-- app_id
-- asc_app_id
-- monitoring_enabled
-- last_synced_at
-- raw_snapshot
-- created_at
-- updated_at
-
-**checks**
-- id
-- app_id
-- version_label
-- build_number
-- status
-- readiness
-- started_at
-- completed_at
-- error_message
-
-**findings**
-- id
-- check_id
-- category
-- severity
-- code
-- title
-- detail
-- how_to_fix
-- raw_evidence
-- created_at
-
-**finding_states**
-Track whether findings are:
-- open
-- resolved
-and allow comparison between checks.
-
-**check_comparisons**
-Store comparison information between two checks.
-
-**reports**
-Store generated report information.
-
-**rejection_analyses**
-- user_id
-- app_id nullable
-- input_text
-- analysis
-- created_at
-
-**ai_explanations**
-Cache AI explanations.
-Include:
-- subject_type
-- subject_id
-- content_hash
-- content
-- model
-- created_at
-
-**webhook_events**
-Store actual App Store Connect webhook events.
-Include:
-- connection
-- Apple event ID
-- event type
-- payload
-- signature validity
-- received time
-*(Use a unique constraint on the Apple event ID where appropriate to prevent duplicate processing.)*
-
-**activity_events**
-Store real application activity derived from:
-- webhook events
-- synchronization changes
-
-**notifications**
-- user_id
-- app_id
-- kind
-- title
-- body
-- read_at
-- created_at
-- link_target
-
-**beta_snapshots**
-Store real TestFlight-related snapshots when available.
-
-**reviews**
-Store real App Store customer review data when available.
-Do not invent records.
-
----
-
-## 8. AUTHENTICATION
-Use Supabase Auth.
-Implement:
-- signup
-- login
-- logout
-- session persistence
-- protected routes
-- authenticated workspace
-Initially support email/password.
-Do not build custom authentication.
-
----
-
-## 9. WEBSITE ROUTES
-Build these routes:
 ```text
-/
-/search
-/apps/preview/:trackId
-/login
-/signup
-/dashboard
-/apps
-/apps/:id
-/apps/:id/check
-/checks/:checkId
-/checks/:checkId/compare/:baseId
-/apps/:id/history
-/rejection-solver
-/notifications
-/settings
-/reports/:checkId
+Fix It
+
+Check your app before you submit it.
+
+[ Check an App ]
+
+My Apps
+
+Recent Checks
+
+Latest Results
+
+Issues
+
+Connected Apps
+
+Monitoring
+
+Notifications
+
+Credits
 ```
-Protect authenticated routes.
+
+Do not overload it with analytics.
+
+The dashboard is primarily about:
+
+**What should I do next?**
 
 ---
 
-## 10. LANDING PAGE
-Build a simple product landing page.
-Primary message:
-**Check your app before you submit it.**
+# 14. APP OBJECT
 
-Explain the real workflow:
-- upload your build
-- find problems
-- understand what needs fixing
-- recheck
-- connect App Store Connect
-- monitor what happens after submission
+Every user app should become a persistent entity.
 
-Do NOT build a huge marketing website.
-The product itself is the priority.
+An app should have:
 
----
+* Fix It app ID
+* name
+* icon
+* bundle ID
+* source
+* iTunes ID when available
+* creation timestamp
+* last updated timestamp
+* latest check
+* latest readiness
+* current version/build
+* App Store Connect connection status
+* monitoring status
+* lifecycle history
 
-## 11. PUBLIC APP SEARCH
-Before login, users can search public App Store apps.
-Use Apple's public iTunes/App Store search endpoint through a server-side Edge Function.
-The browser should NOT directly depend on an external Apple endpoint if a proxy is required for CORS/rate limiting.
-Search should return only real fields actually returned by Apple.
-Possible information:
-- app name
-- developer/seller
-- category
-- icon
-- rating when actually available
-- App Store identifier
-- other returned public metadata
-Never fabricate missing information.
+An app should not be treated as one isolated scan.
+
+Fix It should build a long-term record for it.
 
 ---
 
-## 12. PUBLIC APP PREVIEW
-When a user opens an app:
-Show the real public app information.
-Then show:
+# 15. APP SOURCES
 
-**Fix It Analysis**
-Use visual locked/shimmer placeholders.
+An app can originate from:
 
-IMPORTANT:
-The locked area must NOT contain fake scores.
-Do not secretly put fake:
-- issue counts
-- readiness
-- warnings
-- critical issues
-- AI analysis
-- percentages
-under the blur.
-The locked UI is simply an access gate.
-Show:
-**Sign up to run Fix It on your app.**
+### Public App Store
 
----
+User discovers it through public Apple search.
 
-## 13. DASHBOARD
-Build a clean dashboard.
-Include:
-- Fix It branding
-- "Check your app before you submit it."
-- Check an App
-- My Apps
-- Recent Checks
-- Latest Results
-- Issues
-- Connected Apps
-- Monitoring
-- Notifications
-- Credits
-Only show actual data.
+### IPA Upload
 
-If the user has no apps, show an honest empty state. Example:
-**No apps yet**
-Check your first app to see what Fix It finds.
+User creates or selects an app inside Fix It and uploads an IPA.
+
+### App Store Connect
+
+User connects Apple credentials and selects an actual app.
+
+### User-provided data
+
+Metadata, screenshots, rejection text, etc.
+
+Every source should be recorded.
 
 ---
 
-## 14. MY APPS
-Show:
-- app name
-- icon
-- bundle ID
-- current version/build when known
-- last check
-- readiness
-- App Store Connect connection
-- monitoring status
-- activity
+# 16. PRE-FLIGHT INPUTS
 
-Possible actual states:
-- Not checked
-- Ready
-- Needs attention
-- Not ready
-- Connected
-- Not connected
-- Monitoring
-- Monitoring disabled
-Never display a state that has not actually been established.
+Fix It should eventually support multiple categories of evidence.
+
+### Build
+
+* IPA
+* version
+* build number
+* bundle ID
+* binary metadata
+* Info.plist
+* provisioning information
+
+### App Store material
+
+* name
+* subtitle
+* description
+* keywords
+* category
+* age rating
+* privacy information
+* URLs
+* review notes
+* support information
+
+### Visual material
+
+* screenshots
+* app preview assets
+* localized screenshot sets
+
+### Review material
+
+* reviewer instructions
+* test credentials
+* previous rejection messages
+
+### Commercial functionality
+
+* subscriptions
+* IAP metadata
+* associated configurations where available
 
 ---
 
-## 15. CHECK AN APP
-Provide two options.
+# 17. IPA PIPELINE
 
-**Option A — Upload .ipa**
-User selects `.ipa`.
-Flow:
+The pipeline:
+
 ```text
-Select .ipa
-↓
-Upload to Supabase Storage
-↓
+Upload IPA
+ ↓
+Validate file
+ ↓
+Store privately
+ ↓
 Create check
-↓
-Process check
-↓
-Extract app
-↓
+ ↓
+Extract archive
+ ↓
+Locate app bundle
+ ↓
+Locate Info.plist
+ ↓
+Inspect binary metadata
+ ↓
+Inspect provisioning profile where possible
+ ↓
 Run deterministic checks
-↓
-Save findings
-↓
+ ↓
+Create findings
+ ↓
 Calculate readiness
-↓
-Show results
+ ↓
+Store result
+ ↓
+AI explanation layer
+ ↓
+Results UI
 ```
 
-**Option B — App Store Connect**
-Allow user to connect App Store Connect and select an existing app.
+The deterministic result is the source of truth.
 
 ---
 
-## 16. STORAGE
-Use a private Supabase Storage bucket:
-`ipa-uploads`
-Suggested path:
-`{user_id}/{check_id}.ipa`
-Files must not be public.
-Only authorized server-side processing should access them.
-Start with a reasonable MVP file size limit such as 200 MB.
-If technical limits require a lower limit, communicate it clearly.
+# 18. IPA CHECK CATEGORIES
 
----
+## A. Binary/build
 
-## 17. IPA ANALYSIS ENGINE
-This is one of the most important parts of Fix It.
-The analysis engine is the **source of truth**.
-The AI does NOT create findings.
+Where technically determinable:
 
-Flow:
-```text
-IPA
- ↓
-Extraction
- ↓
-Deterministic checks
- ↓
-Structured findings
- ↓
-Database
- ↓
-Readiness
- ↓
-AI explanation
-```
-Never reverse this.
-AI cannot invent a missing permission, configuration issue, score or Apple status.
+* supported architecture
+* minimum iOS version
+* bundle information
+* version
+* build number
+* application identifier
+* required metadata
 
----
+## B. Info.plist
 
-## 18. MVP CHECK CATALOG
-Implement real checks that can actually be determined from the available input.
-
-**Binary/build checks**
-Check where technically possible:
-- supported binary architecture
-- minimum iOS version consistency
-- bundle information
-- version
-- build number
-- application identifier
-- required application metadata
-
-**Info.plist checks**
 Check:
-- required keys
-- declared permission frameworks versus usage descriptions
-- malformed or missing relevant values
-- URL configuration
-- ATS exceptions
-- icon configuration
 
-**Permission checks**
-Where a framework/permission is declared, verify appropriate usage-description keys exist.
-Do not claim complete permission compliance if the static information is insufficient.
+* relevant required keys
+* malformed values
+* permission usage descriptions
+* URL configuration
+* ATS exceptions
+* icon configuration
 
-**Icons**
-Check required icon configuration/sizes where deterministically available.
+## C. Permissions
 
-**Provisioning**
-Inspect embedded provisioning profile where possible.
-Detect real problems such as:
-- expired profile
-- obviously incorrect distribution type
-- missing profile data
+Where a declared capability/framework maps to a required usage description:
 
-**URLs**
-Where URLs are explicitly present and technically testable, check reachability.
-If network access cannot reliably be performed, mark the check unavailable rather than passing it.
+verify the appropriate key exists.
 
-**Localization**
-Where deterministically detectable, identify missing expected localized metadata.
+Do not claim complete compliance where static evidence is insufficient.
 
----
+## D. Icons
 
-## 19. APPS CONNECTED THROUGH APP STORE CONNECT
-For connected apps, use real App Store Connect API data.
-Check where the API actually exposes the required data:
-- description
-- keywords
-- screenshots
-- privacy policy URL
-- App Review information
-- age rating
-- build attached to version
-- metadata completeness
-- IAP metadata states
-- version/app status
-Do not claim that Fix It performs checks that Apple does not expose enough information to perform.
+Check:
 
----
+* icon declarations
+* required sizes/configuration
+* deterministically observable inconsistencies
 
-## 20. EXPLICITLY OUT OF MVP
-Do NOT fake or pretend to implement:
-- private API detection
-- complete binary security analysis
-- performance testing
-- App Review simulation
-- screenshot quality judgment
-- guaranteed App Store approval
-If something is not actually implemented, don't show it as a completed check.
+## E. Provisioning
+
+Where available:
+
+* expiration
+* distribution type
+* missing profile data
+* obvious configuration problems
+
+## F. URLs
+
+Where technically testable:
+
+* reachability
+* response failure
+
+If reliable network testing is not possible:
+
+```text
+Unavailable to verify
+```
+
+Never convert unavailable into pass.
+
+## G. Localization
+
+Where deterministically detectable:
+
+* missing localized metadata
+* incomplete expected resources
 
 ---
 
-## 21. READINESS
-Use deterministic readiness.
+# 19. FINDING MODEL
 
-**READY**
-0 critical issues and 0 warnings.
-
-**NEEDS ATTENTION**
-0 critical issues and at least 1 warning.
-
-**NOT READY**
-At least 1 critical issue.
-
-If no check has run:
-`readiness = null`
-Do not display a readiness result before an actual check.
-Do not create a fake percentage score.
-A numeric score is NOT required for MVP.
-
----
-
-## 22. FINDINGS
 Each finding should contain:
-- severity
-- category
-- title
-- what was found
-- why it matters
-- how to fix
-- evidence
-- finding code
+
+```text
+finding_id
+check_id
+category
+severity
+code
+title
+what_was_found
+why_it_matters
+how_to_fix
+evidence
+created_at
+```
 
 Severity:
-- Critical
-- Warning
-- Suggestion
 
-Do not exaggerate severity.
+### Critical
 
----
+A problem that can make the submission materially problematic.
 
-## 23. ISSUE STATES
-Allow users to track issues:
-- Open
-- Fixed
-- Ignored
+### Warning
 
-For comparison, derive:
-- Fixed
-- Remaining
-- New
-from actual findings.
+A meaningful risk requiring review/fix.
+
+### Suggestion
+
+A lower-confidence or improvement-oriented item.
+
+Never exaggerate severity.
 
 ---
 
-## 24. RESULTS PAGE
-The results page should clearly show:
-- App
-- Version
-- Build
-- Readiness
-- Critical
-- Warnings
-- Suggestions
-- Findings
+# 20. FINDING EVIDENCE
 
-Allow filtering by severity/category.
-Each issue can be opened.
+Every finding should be traceable to evidence.
 
----
+Example:
 
-## 25. AI EXPLANATIONS
-AI is a core Fix It feature.
-But AI is an explanation layer, not the source of truth.
-For a real finding, allow:
-- What does this mean?
-- Why does this matter?
-- How do I fix it?
-- What should I check afterward?
-The AI receives the actual finding/evidence as context.
-It must not invent facts.
-If the context doesn't support an answer, say that.
+```text
+Finding:
+Missing NSCameraUsageDescription
+
+Evidence:
+Detected camera-related capability
+Info.plist key absent
+
+Source:
+upload_analysis
+
+Confidence:
+Deterministic
+```
+
+The UI should make it possible to understand:
+
+> Why did Fix It create this issue?
 
 ---
 
-## 26. OLLAMA-FIRST AI
-Use Ollama as the first AI provider.
-Local Ollama normally exposes its API through:
-`http://localhost:11434/api`
-during local development.
-Create a provider abstraction.
-Example concept:
+# 21. READINESS MODEL
+
+For the initial deterministic model:
+
+### READY
+
+0 critical issues
+and
+0 warnings
+
+### NEEDS ATTENTION
+
+0 critical issues
+and
+at least 1 warning
+
+### NOT READY
+
+At least 1 critical issue
+
+### NOT CHECKED
+
+No analysis has run.
+
+Do not create artificial readiness percentages.
+
+A numeric score is optional and should not be introduced merely because dashboards look more impressive with numbers.
+
+---
+
+# 22. AI EXPLANATION ENGINE
+
+AI is an interpretation layer.
+
+AI receives:
+
+```text
+finding
++
+evidence
++
+relevant available context
++
+policy/reference context when available
+```
+
+AI returns structured guidance.
+
+For each issue:
+
+### What is this?
+
+Explain the technical issue in simple language.
+
+### Why does it matter?
+
+Explain why the issue may create risk.
+
+### What should I change?
+
+Give concrete implementation guidance.
+
+### How do I verify it?
+
+Explain what should be checked after the fix.
+
+### What does Fix It actually know?
+
+Be explicit where evidence is incomplete.
+
+AI must never create a new finding just because it thinks something sounds risky.
+
+---
+
+# 23. AI GROUNDING MODEL
+
+The AI should follow:
+
+```text
+FACTS
+ ↓
+EVIDENCE
+ ↓
+GUIDELINE / REFERENCE
+ ↓
+INTERPRETATION
+ ↓
+ACTION
+```
+
+Not:
+
+```text
+AI guess
+ ↓
+fake issue
+```
+
+The AI should use cautious language when certainty is impossible.
+
+Example:
+
+> "This may create a review risk because..."
+
+not:
+
+> "Apple will definitely reject this."
+
+---
+
+# 24. POLICY-AWARE EXPLANATION
+
+Where possible, important findings should contain:
+
+* guideline reference
+* relevant policy section
+* source date/version if tracked
+* evidence from the app
+* explanation of the connection
+
+The ideal result is:
+
+```text
+Potential issue
+↓
+Apple guideline/reference
+↓
+Evidence found in your app
+↓
+Why the evidence matters
+↓
+Recommended change
+↓
+What to verify afterward
+```
+
+This makes the result more trustworthy than an unexplained AI opinion.
+
+---
+
+# 25. AI PROVIDER ARCHITECTURE
+
+Create an abstraction:
+
 ```text
 AI Provider
  ├── Ollama
- └── Future providers
+ └── Future provider(s)
 ```
-Do not hard-code the entire product to one provider.
+
+The core product must not become dependent on one model implementation.
 
 ---
 
-## 27. IMPORTANT OLLAMA DEPLOYMENT REALITY
-A deployed Supabase Edge Function cannot magically access the developer's laptop localhost Ollama.
-Therefore:
+# 26. OLLAMA
 
-**Local development**
-Allow:
+For local development:
+
 ```text
-Supabase local Edge Function
- ↓
-local Ollama
- ↓
-local model
+Supabase/local function
+        ↓
+Ollama
+        ↓
+Local model
 ```
 
-**Production**
-Allow an environment-configured network-reachable Ollama endpoint.
-If no production AI endpoint is configured:
-DO NOT fake AI.
-Show:
-**AI explanation is currently unavailable. Your Fix It results are still available.**
-The product must continue working without AI.
-Do not make a paid LLM mandatory.
+Configuration:
+
+```text
+OLLAMA_URL=
+OLLAMA_MODEL=
+```
+
+Do not assume a specific model exists.
+
+If the model is unavailable:
+
+show:
+
+> AI explanation is currently unavailable. Your Fix It results are still available.
+
+The deterministic product must continue functioning without AI.
 
 ---
 
-## 28. AI CACHING
-Cache explanations using:
-`subject + content hash`
-If the exact same finding has already been explained, reuse the cached explanation where appropriate.
+# 27. AI CACHING
+
+Cache based on:
+
+```text
+subject
++
+content hash
+```
+
+Equivalent findings should not require repeated AI generation unnecessarily.
+
+Example:
+
+```text
+Finding A
+Content Hash X
+      ↓
+AI explanation
+      ↓
+Cache
+
+Same Finding A
+Content Hash X
+      ↓
+Reuse cached explanation
+```
+
 This reduces unnecessary model calls.
 
 ---
 
-## 29. REJECTION SOLVER
-Create: `/rejection-solver`
-User pastes Apple's rejection message.
-AI should explain:
-1. What Apple is saying
-2. What the likely issue is
-3. What area/guideline it relates to
-4. What changes the developer likely needs to make
-5. What to check afterward
+# 28. SCREENSHOT CHECKER
 
-Use cautious language.
-Never promise: "This will definitely get your app approved."
-Instead explain that it is guidance based on the supplied rejection text.
-The rejection solver can work without a connected app.
+Screenshot checking is a first-class product capability.
 
----
+Inputs:
 
-## 30. APP STORE CONNECT CONNECTION
-Build real App Store Connect integration.
-User enters:
-- Issuer ID
-- Key ID
-- `.p8` private key
-These values must be submitted to server-side code.
-Never expose the private key back to the browser.
-Do not log private keys.
-Use server-side JWT generation for Apple API requests.
-Validate the connection against App Store Connect.
-If invalid: Show a useful error.
-Examples:
-- invalid key
-- insufficient API access
-- invalid issuer
-- invalid key ID
-- unauthorized role
+* screenshot images
+* locale
+* intended device context
+* associated metadata where available
+
+Possible deterministic/AI-supported checks:
+
+* dimensions
+* readability
+* text visibility
+* device framing
+* metadata/screenshot inconsistency
+* obvious claim mismatch
+* localization completeness
+* potential guideline concerns
+
+Important:
+
+Do not overclaim image analysis.
+
+If a visual judgment is inherently subjective:
+
+label it as an AI assessment or recommendation rather than deterministic fact.
 
 ---
 
-## 31. APP STORE CONNECT DISCOVERY
-After connection:
-Retrieve the user's real apps from App Store Connect.
-Show:
-- app name
-- bundle ID
-- Apple app ID
-- versions
-- builds where available
-- status
-Allow the user to select an app.
-Save the connection between Fix It and the App Store Connect app.
+# 29. SCREENSHOT RESULT
 
----
+Instead of only returning:
 
-## 32. APP STORE CONNECT SYNC
-Sync real information including where available:
-- app
-- versions
-- builds
-- TestFlight/pre-release information
-- reviews
-- relevant metadata
-- status
-Do not aggressively poll.
-Use user-triggered synchronization plus webhooks where possible.
+> Screenshot issue
 
----
+the ideal UI is:
 
-## 33. MONITORING
-Fix It should monitor connected apps.
-Architecture:
 ```text
-App Store Connect
- ↓
-Apple webhook
- ↓
-Supabase Edge Function
- ↓
-Verify signature
- ↓
-Process event
- ↓
-Database
- ↓
-Notification
- ↓
-Fix It dashboard
+Screenshot 3
+
+Potential issue:
+The visible claim appears inconsistent with the current
+app functionality provided to Fix It.
+
+Why:
+...
+
+Recommended action:
+...
+
+Evidence:
+Screenshot 3
+
+Review:
+AI assessment
 ```
-Apple supports App Store Connect webhook notifications for app events. Use the actual event types supported by Apple's current API.
+
+Whenever technically possible, highlight the relevant area visually.
 
 ---
 
-## 34. WEBHOOK SECURITY
-For App Store Connect webhooks:
-Verify the Apple webhook signature before processing.
-Use the `x-apple-signature` header and configured webhook secret.
-Invalid signature: 401
-Do not process the event.
-Store event IDs and deduplicate repeated deliveries.
-Process events idempotently.
+# 30. METADATA CHECKER
 
----
+Check App Store metadata where the required information is available.
 
-## 35. MONITORING EVENTS
-Support real events where Apple provides them, such as relevant:
-- build status changes
-- app version status changes
-- TestFlight/beta events
-- review-related events where supported
-Do not invent events.
-If Apple doesn't provide a specific event through webhook, use an honest sync/API fallback when appropriate.
-
----
-
-## 36. NOTIFICATIONS
-Create a notification center.
 Examples:
-- Build processed
-- Version status changed
-- Review status changed
-- App rejected
-- App approved
-- TestFlight feedback
-- Action required
-Only create notifications from real events or real synchronization changes.
-No fake notifications.
+
+* title
+* subtitle
+* description
+* keywords
+* URLs
+* privacy policy
+* support links
+* age rating
+* review information
+
+The checker should identify:
+
+* missing information
+* inconsistencies
+* malformed data
+* obvious mismatches
+* potential risks
+* unsupported claims
+
+Do not claim that metadata guarantees approval.
 
 ---
 
-## 37. ACTIVITY TIMELINE
-Each connected app should have an activity timeline.
+# 31. CROSS-MATERIAL CONSISTENCY
+
+This can become one of the strongest product capabilities.
+
+Compare:
+
+```text
+IPA
++
+metadata
++
+screenshots
++
+review notes
++
+subscription information
+```
+
+Look for inconsistencies.
+
 Example:
+
 ```text
-Today
-Build 42 processed
+Screenshot says:
+"Track your investments"
 
-Yesterday
-Version 1.2 status changed
+Description says:
+"Budget management app"
 
-Aug 28
-TestFlight feedback received
+Potential inconsistency
 ```
-Every timeline event must come from actual data.
 
----
+Another:
 
-## 38. TESTFLIGHT
-Where the App Store Connect API provides data, show:
-- builds
-- processing status
-- beta versions
-- tester/group information where available
-- feedback/diagnostic information where available
-If data isn't available:
-Do not display fake zeroes.
-Use an appropriate unavailable/empty state.
-
----
-
-## 39. CUSTOMER REVIEWS
-Where App Store Connect provides reviews, show:
-- rating
-- title
-- body
-- date
-- version
-- developer response when available
-Do not create fake reviews.
-If no reviews were retrieved, say so or hide the section appropriately.
-
----
-
-## 40. ANALYTICS
-Do not create fake analytics charts.
-Only show Apple data that is actually retrieved and supported.
-Basic analytics can be implemented where practical.
-Advanced analytics can remain later.
-
----
-
-## 41. RECHECK
-After the developer fixes their app:
-Allow another check.
-The user should be able to:
 ```text
-Previous check
+Review notes say:
+"Users can sign in using email"
+
+But available evidence:
+Login path may not match instructions
+```
+
+The goal is:
+
+**Catch contradictions before Apple does.**
+
+---
+
+# 32. FIX WORKFLOW
+
+Every finding should become actionable.
+
+```text
+Issue
  ↓
-New IPA
+Understand
  ↓
-New check
+Fix
  ↓
+Upload new build
+ ↓
+Recheck
+```
+
+The product should not terminate at the report.
+
+---
+
+# 33. ISSUE STATES
+
+Each issue should support:
+
+* Open
+* Fixed
+* Ignored
+
+Important distinction:
+
+**User marking an issue Fixed is not the same as Fix It verifying it is fixed.**
+
+The system should be able to show:
+
+```text
+Developer status:
+Marked as fixed
+
+Fix It verification:
+Not yet verified
+```
+
+After a new scan:
+
+```text
+Verified resolved
+```
+
+---
+
+# 34. FIX VERIFICATION
+
+This is a major long-term feature.
+
+Example:
+
+Previous finding:
+
+```text
+Login / Reviewer Access
+```
+
+Developer uploads build `2.5.1`.
+
+Fix It runs analysis.
+
+The system compares the new evidence against the previous issue.
+
+Result:
+
+```text
+Previous issue
+
+Login / Reviewer Access
+
+New Build:
+2.5.1
+
+✓ Login flow evidence detected
+✓ Review credentials present
+✓ Review instructions present
+✓ Relevant authentication path detected
+
+STATUS:
+RESOLVED
+```
+
+When evidence does not support resolution:
+
+```text
+STATUS:
+STILL PRESENT
+```
+
+When the system cannot determine:
+
+```text
+STATUS:
+UNABLE TO VERIFY
+```
+
+Never call something fixed merely because the user clicked "Fixed."
+
+---
+
+# 35. RECHECK
+
+Recheck workflow:
+
+```text
+Previous Check
+      ↓
+Upload New IPA
+      ↓
+New Check
+      ↓
+Run Analysis
+      ↓
 Compare
 ```
 
 ---
 
-## 42. COMPARISON
-Compare two actual checks.
-Show:
-- **Fixed**: Issues present before but no longer present.
-- **Remaining**: Issues still present.
-- **New**: Issues introduced by the new build.
+# 36. COMPARISON ENGINE
 
-Also show readiness change:
-`Not Ready → Needs Attention`
-or:
-`Needs Attention → Ready`
-when the underlying data supports it.
+Compare two real checks.
 
----
+Three important states:
 
-## 43. READY TO SUBMIT
-When readiness rules are satisfied:
-Show:
-**Your app is ready to submit.**
-This means Fix It's implemented preflight checks found no critical issues or warnings.
-It does NOT mean:
-Apple has approved your app.
-Never claim approval.
+### Fixed
 
----
+Previous finding exists.
 
-## 44. REPORTS
-Create a report for every completed check.
-Include:
-- app
-- version
-- build
-- date
-- readiness
-- findings
-- fixed/remaining where applicable
-- recommendations
-Provide an in-app report view.
-Add a practical export option where feasible.
-Do not spend excessive time on complex PDF infrastructure if it slows down the core product.
+New check no longer contains it.
 
----
+### Remaining
 
-## 45. HISTORY
-Each app should have history showing:
-- checks
-- versions
-- builds
-- readiness
-- findings
-- comparisons
-- monitoring events
-- status changes
-- rejection-related activity
-Everything must be based on real stored data.
+Previous finding still exists.
 
----
+### New
 
-## 46. CREDITS
-Fix It uses an internal credit system.
-There is: **NO PAYMENT SYSTEM.**
-Do not build:
-- Stripe
-- subscriptions
-- checkout
-- payment processing
-- billing portal
-Credits are simply internal counters for the MVP.
+New finding appears that did not exist in the earlier check.
+
 Example:
-`1 credit = preflight check`
-`1 credit = AI explanation/rejection analysis`
-Give a starting credit allocation on signup.
-Track usage through the credits ledger.
-If balance is zero:
-Show an honest message.
-Do not implement payment.
+
+```text
+CHECK #1
+
+Critical: 2
+Warnings: 4
+
+        ↓ developer fixes
+
+CHECK #2
+
+Critical: 0
+Warnings: 2
+
+Fixed: 4
+Remaining: 2
+New: 0
+```
 
 ---
 
-## 47. SECURITY — ONLY WHAT IS NECESSARY
-Do not over-engineer security.
-But implement the necessary protections:
-- Supabase Auth
-- RLS
-- private Storage
-- server-side Apple credentials
-- encrypted secret storage where appropriate
-- webhook HMAC verification
-- signed/private uploads
-- rate limiting where practical
-- sanitized errors
-- never log private keys
-- never expose service-role credentials to browser code
-Do not create an enormous enterprise security subsystem.
+# 37. READINESS PROGRESSION
+
+Show the actual state transition.
+
+Example:
+
+```text
+NOT READY
+    ↓
+NEEDS ATTENTION
+    ↓
+READY
+```
+
+Or:
+
+```text
+READY
+    ↓
+New build
+    ↓
+NOT READY
+```
+
+This is important because a new build can introduce new problems.
 
 ---
 
-## 48. DATA PROVENANCE
-Every important displayed value should have a real source.
-Possible sources:
-- itunes_search
-- asc_api
-- upload_analysis
-- webhook_event
-- user_input
-The UI must not pretend data came from Apple if it came from user input.
-The analysis engine produces findings.
-AI produces explanations.
-Apple produces App Store Connect data.
+# 38. READY-TO-SUBMIT EXPERIENCE
+
+When the deterministic requirements are satisfied:
+
+```text
+YOUR APP IS READY TO SUBMIT
+```
+
+Explain:
+
+> Fix It's implemented checks found no critical issues or warnings.
+
+Then explicitly clarify:
+
+> This does not mean Apple has approved your app.
+
+Never imply guaranteed approval.
 
 ---
 
-## 49. NO FAKE DATA — ABSOLUTE RULE
-Never fabricate:
-- app names
-- developers
-- ratings
-- reviews
-- builds
-- versions
-- Apple statuses
-- TestFlight information
-- analytics
-- findings
-- readiness
-- scores
-- notifications
-- webhook events
-- AI conclusions
+# 39. SUBMISSION CHECKLIST
 
-If something isn't available:
-Say:
-- unavailable
-- not connected
-- not checked
-- no data
-- not supported yet
-as appropriate.
+The final checklist can aggregate:
+
+* build
+* screenshots
+* metadata
+* privacy
+* URLs
+* reviewer notes
+* login information
+* IAP
+* subscriptions
+* age rating
+* supported material
+* detected issues
+
+Example:
+
+```text
+READY TO SUBMIT
+
+✓ Build
+✓ Metadata
+✓ Screenshots
+✓ Privacy
+✓ Review notes
+✓ Login information
+✓ IAP
+
+0 critical
+0 warnings
+```
 
 ---
 
-## 50. ERROR HANDLING
-Errors should be understandable.
+# 40. APP STORE CONNECT CONNECTION
+
+The developer enters:
+
+* Issuer ID
+* Key ID
+* `.p8` private key
+
+Credentials must go to server-side processing.
+
+Never expose the private key back to frontend code.
+
+Never log it.
+
+Server generates JWT for Apple API communication.
+
+---
+
+# 41. APP STORE CONNECT DISCOVERY
+
+After a successful connection:
+
+```text
+App Store Connect
+ ↓
+Retrieve apps
+ ↓
+Show actual apps
+ ↓
+Developer selects app
+ ↓
+Save connection
+```
+
+Show:
+
+* app name
+* bundle ID
+* Apple app ID
+* versions
+* builds
+* statuses where available
+
+---
+
+# 42. APP STORE CONNECT SYNC
+
+Sync available real information:
+
+* app
+* versions
+* builds
+* status
+* metadata
+* TestFlight/pre-release data
+* reviews
+* other supported information
+
+Avoid aggressive polling.
+
+Prefer:
+
+* user-triggered sync
+* webhooks where available
+* appropriate API fallback
+
+---
+
+# 43. CONNECTED APP DASHBOARD
+
+Once connected, an app can have:
+
+```text
+APP
+
+MyApp
+
+Version:
+2.5.0
+
+Build:
+250
+
+Last Fix It scan:
+Today
+
+Readiness:
+READY
+
+App Store Connect:
+CONNECTED
+
+Monitoring:
+ON
+
+Last sync:
+...
+```
+
+The information must be real.
+
+---
+
+# 44. CONTINUOUS MONITORING
+
+The long-term workflow:
+
+```text
+APP STORE CONNECT
+       ↓
+APPLE EVENT / SYNC
+       ↓
+WEBHOOK EDGE FUNCTION
+       ↓
+VERIFY EVENT
+       ↓
+STORE EVENT
+       ↓
+PROCESS CHANGE
+       ↓
+DETERMINE IMPACT
+       ↓
+CREATE ACTIVITY
+       ↓
+CREATE NOTIFICATION
+       ↓
+USER DASHBOARD
+```
+
+---
+
+# 45. WEBHOOK SECURITY
+
+For webhook events:
+
+* verify signature
+* reject invalid signatures
+* deduplicate event IDs
+* process idempotently
+* store raw payload safely
+* store validation result
+
+Example:
+
+```text
+Webhook received
+ ↓
+Signature verification
+ ↓
+Invalid → 401
+Valid → process
+```
+
+Never process unverified events.
+
+---
+
+# 46. CHANGE DETECTION
+
+The monitoring system should eventually detect meaningful changes.
+
 Examples:
-- **Upload failed**: We couldn't upload this build. Try again.
-- **Invalid IPA**: This file doesn't contain a valid iOS app bundle Fix It can analyze.
-- **App Store Connect connection failed**: Fix It couldn't connect to App Store Connect. Check your API credentials and access.
-- **AI unavailable**: AI explanation is unavailable right now. Your Fix It result is still available.
-Never show raw stack traces to normal users.
+
+```text
+New build detected
+Metadata changed
+Screenshot set changed
+Version status changed
+Review status changed
+TestFlight information changed
+Review received
+```
+
+When a meaningful change occurs, Fix It can determine whether another review-risk analysis should be considered.
 
 ---
 
-## 51. LOADING STATES
-Use real states.
-For analysis:
-- Uploading
-- Extracting
-- Analyzing
-- Saving results
-- Complete
-Do not show fake progress percentages.
-If the system doesn't know 43% is complete, don't display 43%.
+# 47. SMART CHANGE → RISK FLOW
+
+Long-term intelligent flow:
+
+```text
+Change detected
+      ↓
+What changed?
+      ↓
+Build?
+Metadata?
+Screenshot?
+Subscription?
+Version?
+      ↓
+Does this affect known review risks?
+      ↓
+YES → create new review-risk signal
+NO → store activity only
+```
+
+Example:
+
+```text
+Screenshots changed
+ ↓
+Compare previous screenshots
+ ↓
+Potential mismatch detected
+ ↓
+Create review-risk notification
+```
+
+This is where Fix It becomes a continuous guardian rather than a one-time scanner.
 
 ---
 
-## 52. UI DESIGN
-Create a clean developer-tool interface.
+# 48. NOTIFICATIONS
+
+Notification center can contain real events such as:
+
+* Build processed
+* Version status changed
+* Review status changed
+* App rejected
+* App approved
+* TestFlight feedback
+* Action required
+* New review risk detected
+
+Every notification needs a real source.
+
+---
+
+# 49. ACTIVITY TIMELINE
+
+Each connected app gets a timeline.
+
+Example:
+
+```text
+TODAY
+
+Build 42 processed
+
+Yesterday
+
+Version 1.2 status changed
+
+Aug 28
+
+TestFlight feedback received
+```
+
+Eventually:
+
+```text
+Sep 15
+Build 2.5.1 uploaded
+
+Sep 15
+Fix It detected 2 warnings
+
+Sep 16
+Issues resolved
+
+Sep 16
+App submitted
+
+Sep 17
+In Review
+
+Sep 17
+Rejected
+
+Sep 17
+Rejection analyzed
+
+Sep 18
+Build 2.5.2 uploaded
+
+Sep 18
+Previous issues verified resolved
+
+Sep 19
+Approved
+```
+
+This becomes the app's review history.
+
+---
+
+# 50. TESTFLIGHT
+
+Where real API data is available, show:
+
+* builds
+* processing status
+* beta versions
+* tester/group information where available
+* feedback/diagnostic information where available
+
+If data is unavailable:
+
+do not display artificial zeroes.
+
 Use:
-- white/light surfaces
-- subtle borders
-- restrained shadows
-- clear typography
-- compact tables
-- monospace for IDs/version/build information
-- semantic red/amber/green states
-- blue primary action
-Keep the UI professional.
-Do not fill the application with unnecessary gradients, huge animations or decorative components.
+
+```text
+No TestFlight data available
+```
+
+or an equivalent honest state.
 
 ---
 
-## 53. RESPONSIVE WEB
-The application must work in modern desktop browsers and remain usable on smaller screens.
-But remember:
-**Responsive web is NOT a native mobile app.**
-Do not build a separate mobile application.
+# 51. CUSTOMER REVIEWS
+
+Where available:
+
+* rating
+* title
+* body
+* date
+* version
+* developer response
+
+Never create fake review information.
 
 ---
 
-## 54. EMPTY STATES
-Every major section needs a useful empty state.
-Examples:
-- **No apps**: No apps yet. Check your first app.
-- **No checks**: No checks yet. Upload a build to start.
-- **No notifications**: You're all caught up.
-- **No reviews**: No reviews available.
-- **No monitoring**: Connect App Store Connect to start monitoring.
+# 52. APP REVIEW HISTORY
+
+Every app should eventually maintain a review-history record.
+
+Example:
+
+```text
+VERSION 2.3
+Rejected
+Guideline 2.1
+Status: Fixed
+
+VERSION 2.4
+Rejected
+Guideline 5.1.1
+Status: Fixed
+
+VERSION 2.5
+Approved
+```
+
+This allows Fix It to build persistent context around the app.
 
 ---
 
-## 55. ACCESS CONTROL
-Public users:
-- landing
-- app search
-- app preview
-- login
-- signup
+# 53. APP MEMORY
 
-Authenticated users:
-- dashboard
-- apps
-- checks
-- results
-- rejection solver
-- notifications
-- reports
-- settings
-- App Store Connect
+The app should become increasingly intelligent over time.
+
+Example:
+
+```text
+This app has previously experienced:
+- login/reviewer access issue
+- metadata issue
+- privacy-related issue
+```
+
+When a new build arrives:
+
+Fix It can prioritize checks relevant to the app's history.
+
+Example:
+
+```text
+⚠ Previous recurring risk
+
+Reviewer access
+
+This app has previously had an issue
+in this area.
+
+Run verification
+```
+
+This should always be based on stored real history.
+
+Never pretend the system remembers something it did not store.
+
+---
+
+# 54. REJECTION SOLVER
+
+Route:
+
+```text
+/rejection-solver
+```
+
+Input:
+
+* Apple rejection message
+* optional app association
+* optional existing check
+* optional build information
+* optional previous history
+
+AI should produce:
+
+### What Apple is saying
+
+Plain-English interpretation.
+
+### Likely issue
+
+Based strictly on supplied evidence.
+
+### Guideline area
+
+Where supportable.
+
+### What needs to change
+
+Practical next actions.
+
+### What to check afterward
+
+Specific verification steps.
+
+### Suggested response
+
+Professional draft that the developer can edit.
+
+---
+
+# 55. REJECTION RESPONSE GENERATOR
+
+Long-term flow:
+
+```text
+Apple rejection
++
+changes made
++
+guideline
++
+evidence
++
+review instructions
+↓
+Generate response draft
+↓
+Developer edits
+↓
+Developer submits
+```
+
+The generated response must never claim certainty or guarantee approval.
+
+---
+
+# 56. REJECTION → FIX → VERIFICATION
+
+The ideal rejection workflow:
+
+```text
+REJECTED
+    ↓
+Upload rejection
+    ↓
+Rejection Solver
+    ↓
+Understand issue
+    ↓
+Generate fix checklist
+    ↓
+Developer changes app
+    ↓
+Upload new IPA
+    ↓
+Fix It rechecks
+    ↓
+Compare against rejection-related risk
+    ↓
+Verify resolved
+    ↓
+Ready to resubmit
+    ↓
+Resubmit
+    ↓
+Monitor
+```
+
+This is one of the strongest expressions of the end-to-end product.
+
+---
+
+# 57. REPORTS
+
+Every completed check should have a report.
+
+Report contains:
+
+* app
+* version
+* build
+* date
+* readiness
+* critical findings
+* warnings
+* suggestions
+* evidence
+* fixed issues
+* remaining issues
+* new issues
+* recommendations
+
+Provide:
+
+* in-app report
+* practical export where feasible
+
+Do not allow report infrastructure to delay core product functionality.
+
+---
+
+# 58. HISTORY
+
+App history should contain:
+
+* checks
+* versions
+* builds
+* readiness
+* findings
+* comparisons
+* rejection analyses
+* monitoring events
+* status changes
+* notifications
+* review activity
+* fix verification
+
+The history should become the long-term memory of the app.
+
+---
+
+# 59. CREDITS
+
+Initial MVP can use internal credits.
+
+No payment system required.
+
+Example:
+
+```text
+1 credit = preflight
+1 credit = AI explanation
+1 credit = rejection analysis
+```
+
+Use a ledger.
+
+Do not rely on a manually drifting numeric balance.
+
+Credit balance:
+
+```text
+SUM(all ledger deltas)
+```
+
+Initial signup can receive starting credits.
+
+When zero:
+
+show honest messaging.
+
+---
+
+# 60. PAYMENT IS NOT PART OF THE INITIAL MVP
+
+Do not build:
+
+* Stripe
+* checkout
+* subscriptions
+* billing portal
+* payment processing
+
+First prove:
+
+```text
+problem
+↓
+usage
+↓
+repeat usage
+↓
+value
+↓
+willingness to pay
+```
+
+Monetization can be added after validation.
+
+---
+
+# 61. DATA PROVENANCE
+
+Every important displayed value should have a source.
+
+Possible sources:
+
+```text
+itunes_search
+asc_api
+upload_analysis
+screenshot_analysis
+user_input
+webhook_event
+rejection_input
+```
+
+UI should never imply:
+
+> "Apple says..."
+
+when the information came from:
+
+> user input
+
+Similarly:
+
+AI-generated interpretation must not be represented as direct Apple data.
+
+---
+
+# 62. SECURITY
+
+Implement necessary security only.
+
+Required:
+
+* Supabase Auth
+* RLS
+* private Storage
+* server-side Apple credentials
+* encrypted secrets where appropriate
+* webhook signature verification
+* private uploads
+* signed access
+* practical rate limiting
+* sanitized errors
+* no private key logging
+* no service-role credentials in frontend
+
+Do not create enterprise infrastructure unnecessarily.
+
+---
+
+# 63. PRIVATE FILE STORAGE
+
+IPA files should live in a private bucket.
+
+Example:
+
+```text
+ipa-uploads/
+    {user_id}/
+        {check_id}.ipa
+```
+
+Files should not be public.
+
+Only authorized processing should access them.
+
+Start with a reasonable MVP file limit such as 200 MB, adjusting where infrastructure requires it.
+
+---
+
+# 64. ACCESS CONTROL
+
+### Public
+
+* landing
+* public search
+* public app preview
+* login
+* signup
+
+### Authenticated
+
+* dashboard
+* apps
+* checks
+* results
+* rejection solver
+* notifications
+* reports
+* settings
+* App Store Connect
 
 Users must only access their own private data.
 
 ---
 
-## 56. SUPABASE EDGE FUNCTIONS
-Create appropriate functions.
-Suggested structure:
+# 65. CORE DATABASE MODEL
+
+Core entities:
+
+```text
+profiles
+credits_ledger
+apps
+asc_connections
+connected_apps
+checks
+findings
+finding_states
+check_comparisons
+reports
+rejection_analyses
+ai_explanations
+webhook_events
+activity_events
+notifications
+beta_snapshots
+reviews
+```
+
+Potential future entities:
+
+```text
+app_materials
+screenshots
+metadata_snapshots
+policy_references
+fix_verifications
+review_events
+submission_events
+```
+
+These should only be added when needed.
+
+---
+
+# 66. RELATIONSHIP MODEL
+
+Conceptually:
+
+```text
+USER
+ │
+ ├── APPS
+ │    │
+ │    ├── CHECKS
+ │    │    ├── FINDINGS
+ │    │    ├── AI EXPLANATIONS
+ │    │    ├── REPORTS
+ │    │    └── COMPARISONS
+ │    │
+ │    ├── APP STORE CONNECT CONNECTION
+ │    │
+ │    ├── MONITORING EVENTS
+ │    │
+ │    ├── REJECTIONS
+ │    │
+ │    └── HISTORY
+ │
+ ├── NOTIFICATIONS
+ │
+ └── CREDITS
+```
+
+---
+
+# 67. IMPORTANT STATE MACHINE
+
+An individual app can conceptually move through:
+
+```text
+NOT_CHECKED
+      ↓
+CHECKED
+      ↓
+ISSUES_FOUND
+      ↓
+FIXING
+      ↓
+RECHECKED
+      ↓
+READY
+      ↓
+SUBMITTED
+      ↓
+WAITING_FOR_REVIEW
+      ↓
+IN_REVIEW
+      ↓
+APPROVED
+```
+
+Or:
+
+```text
+IN_REVIEW
+    ↓
+REJECTED
+    ↓
+REJECTION_ANALYZED
+    ↓
+FIXING
+    ↓
+RECHECKED
+    ↓
+RESUBMITTED
+    ↓
+IN_REVIEW
+```
+
+These states should be based on actual data.
+
+---
+
+# 68. UI PRINCIPLES
+
+The product should feel like a serious developer tool.
+
+Use:
+
+* clean white/light surfaces
+* subtle borders
+* restrained shadows
+* clear typography
+* compact tables
+* monospace for IDs/build/version
+* semantic red/amber/green states
+* blue primary actions
+
+Avoid:
+
+* excessive gradients
+* giant animations
+* decorative clutter
+* giant enterprise dashboards
+* fake metrics
+
+---
+
+# 69. RESULTS PAGE
+
+Example structure:
+
+```text
+MyApp
+v2.5.1
+Build 251
+
+READY
+
+0 Critical
+1 Warning
+4 Suggestions
+
+--------------------------------
+
+Critical
+None
+
+Warnings
+
+[ Login reviewer access ]
+Potential issue...
+
+[ Open ]
+
+Suggestions
+
+...
+
+--------------------------------
+
+AI Explanation
+[ Explain ]
+
+Evidence
+[ View ]
+
+Previous Check
+[ Compare ]
+
+Run Recheck
+```
+
+The result should answer:
+
+**What happened?**
+
+**Why?**
+
+**What should I do?**
+
+**Did my fix work?**
+
+---
+
+# 70. RESULT DETAILS
+
+Every finding should support:
+
+```text
+TITLE
+
+Severity
+
+What we found
+
+Why it matters
+
+Evidence
+
+Apple / guideline reference
+when available
+
+How to fix
+
+What to check afterward
+
+Status
+
+AI explanation
+```
+
+---
+
+# 71. AI EXPLANATION UX
+
+Do not dump a giant AI answer.
+
+Use sections:
+
+```text
+What this means
+
+Why it matters
+
+What to change
+
+How to verify the fix
+```
+
+Potential action:
+
+```text
+[ Mark Fixed ]
+[ Explain More ]
+```
+
+But verification must later determine whether it is actually resolved.
+
+---
+
+# 72. NO FAKE LOADING
+
+Use real processing stages.
+
+Example:
+
+```text
+Uploading
+Extracting
+Analyzing
+Saving results
+Complete
+```
+
+Never show:
+
+```text
+43%
+68%
+91%
+```
+
+unless actual measurable progress exists.
+
+---
+
+# 73. ERROR HANDLING
+
+User-facing errors must be understandable.
+
+Example:
+
+### Upload
+
+> We couldn't upload this build. Try again.
+
+### Invalid IPA
+
+> This file doesn't contain a valid iOS app bundle Fix It can analyze.
+
+### Apple connection
+
+> Fix It couldn't connect to App Store Connect. Check your API credentials and access.
+
+### AI unavailable
+
+> AI explanation is unavailable right now. Your Fix It result is still available.
+
+Never show raw stack traces to normal users.
+
+---
+
+# 74. APP STORE SEARCH
+
+Public search should use Apple's real public search data.
+
+Return only fields actually supplied.
+
+Potential fields:
+
+* app name
+* seller
+* category
+* icon
+* rating when available
+* App Store ID
+* other available metadata
+
+Do not fabricate missing information.
+
+---
+
+# 75. PUBLIC APP PREVIEW
+
+Example:
+
+```text
+App icon
+App name
+Developer
+Category
+Rating
+
+Real public information
+
+-------------------------
+
+FIX IT ANALYSIS
+
+[Locked preview]
+
+Sign up to run Fix It on your app.
+```
+
+The locked region is an access gate, not fake analytics.
+
+---
+
+# 76. EDGE FUNCTIONS
+
+Possible structure:
+
 ```text
 supabase/functions/
- itunes-search/
- analyze-ipa/
- ai-explain/
- asc-connect/
- asc-apps/
- asc-sync/
- webhook-asc/
- report-generate/
+
+itunes-search/
+analyze-ipa/
+ai-explain/
+asc-connect/
+asc-apps/
+asc-sync/
+webhook-asc/
+report-generate/
 ```
-You may combine functions when doing so makes the system simpler.
-Do not create dozens of tiny functions unnecessarily.
-Use shared utilities under:
-`supabase/functions/_shared/`
-where appropriate.
-Use proper versioned imports compatible with the Supabase/Deno environment.
 
----
+Shared code:
 
-## 57. ANALYSIS PROCESSING
-Do not assume Edge Functions can perform unlimited heavy work.
-Keep MVP analysis lightweight.
-The MVP should focus on:
-- archive extraction
-- plist parsing
-- metadata inspection
-- deterministic checks
-If a particular `.ipa` operation genuinely exceeds the runtime limits, identify the limitation and implement the simplest reliable solution rather than silently pretending it works.
-
----
-
-## 58. REAL-TIME
-Use Supabase Realtime only where it provides real value.
-Good uses:
-- check processing status
-- notifications
-Do not add Realtime everywhere just because it exists.
-
----
-
-## 59. APPLE API ACCURACY
-When implementing Apple APIs:
-Use Apple's current official API documentation as the source of truth.
-Do not rely on outdated examples if the current API differs.
-Handle:
-- authentication
-- rate limits
-- pagination
-- HTTP errors
-- unavailable resources
-- permission errors
-Do not hard-code fake API responses.
-For App Store Connect webhooks, follow Apple's current webhook format and signature verification requirements.
-
----
-
-## 60. OLLAMA ACCURACY
-Use the Ollama HTTP API.
-Do not invent undocumented endpoints.
-Allow the model name to be configured through environment variables.
-Example configuration:
 ```text
-OLLAMA_URL
-OLLAMA_MODEL
+_shared/
 ```
-Do not assume a particular model exists.
-If the configured model isn't available, return a clear error.
+
+Combine functions where doing so makes the system simpler.
+
+Do not create dozens of tiny functions.
 
 ---
 
-## 61. ENVIRONMENT VARIABLES
-Create a clear `.env.example`.
-Include only necessary configuration such as:
+# 77. ANALYSIS ENGINE ARCHITECTURE
+
+The engine should be modular.
+
+Conceptually:
+
 ```text
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+ANALYSIS PIPELINE
 
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-
-OLLAMA_URL=
-OLLAMA_MODEL=
+Input
+ ↓
+Extractor
+ ↓
+Artifact parser
+ ↓
+Check registry
+ ↓
+Individual checks
+ ↓
+Structured findings
+ ↓
+Finding normalization
+ ↓
+Persistence
+ ↓
+Readiness calculator
+ ↓
+AI explanation
 ```
-Do not commit real secrets.
-Never put Supabase service-role keys in frontend code.
 
----
+Possible internal checks:
 
-## 62. PROJECT STRUCTURE
-Keep a clean structure similar to:
 ```text
-src/
- components/
- pages/
- layouts/
- hooks/
- lib/
- services/
- types/
- features/
-
-supabase/
- migrations/
- functions/
-  _shared/
-  itunes-search/
-  analyze-ipa/
-  ai-explain/
-  asc-connect/
-  asc-apps/
-  asc-sync/
-  webhook-asc/
-  report-generate/
+BinaryArchitectureCheck
+BundleIdentifierCheck
+VersionCheck
+BuildNumberCheck
+InfoPlistCheck
+PermissionCheck
+IconCheck
+ProvisioningCheck
+URLCheck
+LocalizationCheck
 ```
-Adjust this if a simpler structure is better.
-Do not create unnecessary abstractions.
+
+Each check should produce structured results.
 
 ---
 
-## 63. TESTING
-Actually test the product.
-At minimum verify:
+# 78. CHECK RESULT CONTRACT
 
-**Authentication**
-- signup
-- login
-- logout
-- protected routes
+Each deterministic check should conceptually return:
 
-**Public search**
-- real app search
-- empty results
-- API failure
-
-**IPA**
-- valid IPA
-- invalid file
-- malformed archive
-- missing app bundle
-- missing plist
-- actual finding detection
-
-**Analysis**
-- critical issue
-- warning
-- suggestion
-- clean result
-- readiness calculation
-
-**AI**
-- Ollama available
-- Ollama unavailable
-- grounded explanation
-- no hallucinated finding
-
-**App Store Connect**
-- invalid credentials
-- successful authentication where available
-- app discovery
-- synchronization
-- API errors
-
-**Webhooks**
-- valid signature
-- invalid signature
-- duplicate event
-- event processing
-
-**Credits**
-- credit grant
-- credit deduction
-- zero balance
-- ledger arithmetic
-
-**Security**
-- user cannot access another user's apps/checks
-- private IPA files cannot be publicly accessed
-- Apple private key never appears in frontend responses
-
----
-
-## 64. DO NOT USE FAKE BACKENDS
-During development, do not make fake APIs look like real functionality.
-If an integration cannot be tested because credentials aren't available:
-Build the real integration and provide an honest configuration/empty/error state.
-Do not create fake App Store Connect data just to make the UI look complete.
-Do not create fake reviews.
-Do not create fake checks.
-Do not create fake webhook events and display them as production events.
-Test fixtures are acceptable only inside automated tests and must never appear as real user data.
-
----
-
-## 65. MVP PRIORITY
-Build in this order:
-
-**Phase 1 — Foundation**
-- React/Vite/TypeScript
-- Tailwind
-- routing
-- Supabase connection
-- database
-- RLS
-- authentication
-- base layout
-
-**Phase 2 — Public experience**
-- landing
-- Apple app search
-- real results
-- public app preview
-- locked analysis
-
-**Phase 3 — Workspace**
-- dashboard
-- My Apps
-- app details
-- credits
-- empty states
-
-**Phase 4 — Preflight**
-- IPA upload
-- Storage
-- extraction
-- analysis engine
-- findings
-- readiness
-- results UI
-
-**Phase 5 — AI**
-- Ollama provider
-- AI explanations
-- caching
-- failure handling
-- rejection solver
-
-**Phase 6 — App Store Connect**
-- credentials
-- JWT
-- connection
-- app discovery
-- sync
-- connected app dashboard
-
-**Phase 7 — Monitoring**
-- webhook endpoint
-- signature verification
-- event processing
-- activity timeline
-- notifications
-- Realtime
-
-**Phase 8 — Connected data**
-- TestFlight
-- reviews
-- supported metadata/status information
-
-**Phase 9 — Recheck and reports**
-- history
-- comparison
-- reports
-- credit enforcement
-- settings
-
-**Phase 10 — Verification**
-Test the complete journey from:
 ```text
-Public search
-→ signup
-→ dashboard
-→ upload IPA
-→ analysis
-→ findings
-→ AI explanation
-→ fix
-→ recheck
-→ compare
-→ App Store Connect
-→ monitoring
-→ notification
-→ rejection solver
+check_code
+status
+severity
+title
+detail
+evidence
+source
 ```
 
----
+Possible status:
 
-## 66. IMPORTANT: BUILD INCREMENTALLY
-Do not attempt to generate the entire codebase blindly in one huge operation.
-Build a working foundation first.
-After each major phase:
-1. Run/build/test it.
-2. Fix errors.
-3. Verify the feature actually works.
-4. Continue to the next phase.
-Do not move forward while the previous foundation is fundamentally broken.
+```text
+PASS
+FAIL
+WARNING
+UNAVAILABLE
+NOT_APPLICABLE
+```
 
----
-
-## 67. DO NOT ASK UNNECESSARY QUESTIONS
-Make reasonable engineering decisions yourself.
-Only ask me something if it is genuinely impossible to proceed without a decision.
-Do not repeatedly ask for permission to create normal files, components, migrations or functions.
-You have permission to build the product described here.
+This prevents the system from confusing unavailable data with passed data.
 
 ---
 
-## 68. DO NOT CHANGE THE PRODUCT
+# 79. AI INPUT CONTRACT
+
+AI should receive structured context.
+
+Example:
+
+```text
+Finding:
+...
+
+Severity:
+Warning
+
+Evidence:
+...
+
+Source:
+upload_analysis
+
+Relevant policy reference:
+...
+
+Existing app context:
+...
+
+Previous state:
+...
+```
+
+The AI should not have authority to mutate deterministic findings.
+
+---
+
+# 80. AI OUTPUT CONTRACT
+
+Prefer structured output.
+
+Example:
+
+```text
+summary
+why_it_matters
+recommended_action
+verification_steps
+caution
+```
+
+The frontend renders this rather than trusting arbitrary AI formatting.
+
+---
+
+# 81. AI SAFETY AGAINST HALLUCINATION
+
+Rules:
+
+1. Do not invent evidence.
+2. Do not invent Apple status.
+3. Do not invent findings.
+4. Do not invent guideline references.
+5. Do not claim certainty when evidence is incomplete.
+6. Do not promise approval.
+7. Do not turn unsupported assumptions into facts.
+
+---
+
+# 82. POLICY UPDATE SYSTEM — FUTURE
+
+Eventually create a policy reference layer.
+
+Concept:
+
+```text
+Apple policy source
+ ↓
+policy document/version
+ ↓
+structured reference
+ ↓
+finding references policy
+ ↓
+AI uses current reference
+```
+
+Potential capabilities:
+
+* guideline version
+* last updated date
+* affected checks
+* change history
+
+This can become one of Fix It's strongest long-term reliability systems.
+
+---
+
+# 83. APP-SPECIFIC RISK PROFILE — FUTURE
+
+Over multiple checks:
+
+```text
+APP REVIEW PROFILE
+
+Most common historical risks:
+1. Reviewer access
+2. Metadata
+3. Privacy configuration
+
+Latest check:
+...
+
+Previous failures:
+...
+
+Previous resolved issues:
+...
+```
+
+This is based on real stored history.
+
+---
+
+# 84. CHANGE-AWARE ANALYSIS — FUTURE
+
+When a new build is detected:
+
+```text
+Previous state
+      ↓
+New state
+      ↓
+What changed?
+      ↓
+Which checks are affected?
+      ↓
+Run affected analysis
+      ↓
+Compare
+```
+
+This can reduce unnecessary work.
+
+---
+
+# 85. CONTINUOUS REVIEW-RISK ENGINE — FUTURE
+
+Eventually:
+
+```text
+APP CONNECTED
+      ↓
+MONITOR CHANGES
+      ↓
+CHANGE DETECTED
+      ↓
+RISK RE-EVALUATION
+      ↓
+NO ISSUE
+    OR
+NEW RISK
+      ↓
+NOTIFICATION
+```
+
+This is the long-term vision behind the product.
+
+---
+
+# 86. COMPLETE CUSTOMER EXPERIENCE
+
+A fully developed Fix It journey:
+
+```text
+1. Developer builds app
+
+2. Developer opens Fix It
+
+3. Developer adds app
+
+4. Uploads IPA
+
+5. Uploads supporting material
+
+6. Fix It analyzes build
+
+7. Fix It analyzes screenshots
+
+8. Fix It checks metadata
+
+9. Fix It detects issues
+
+10. Fix It explains issues
+
+11. Developer fixes issues
+
+12. Developer uploads new build
+
+13. Fix It rescans
+
+14. Fix It verifies previous fixes
+
+15. Fix It compares builds
+
+16. App becomes ready to submit
+
+17. Developer connects App Store Connect
+
+18. Fix It syncs actual app data
+
+19. Developer submits app
+
+20. Fix It monitors status
+
+21. Apple approves
+OR
+22. Apple rejects
+
+23. If rejected:
+    rejection enters Fix It
+
+24. Fix It explains rejection
+
+25. Fix It generates fix checklist
+
+26. Fix It generates optional response draft
+
+27. Developer fixes app
+
+28. New build uploaded
+
+29. Fix It verifies fixes
+
+30. Fix It rescans
+
+31. Developer resubmits
+
+32. Fix It monitors again
+
+33. App approved
+
+34. Fix It retains the complete history
+```
+
+That is the **end-to-end product**.
+
+---
+
+# 87. PRODUCT PHILOSOPHY
+
+Fix It should always answer one of these questions:
+
+### Before submission
+
+> What might be wrong?
+
+### During fixing
+
+> What exactly should I change?
+
+### After fixing
+
+> Did the change actually resolve it?
+
+### During submission
+
+> Is everything I can verify ready?
+
+### During review
+
+> What's happening?
+
+### After rejection
+
+> What is Apple saying?
+
+### After rejection fix
+
+> Did I actually resolve the previous problem?
+
+This keeps the product focused.
+
+---
+
+# 88. WHAT NOT TO BUILD
+
 Do not turn Fix It into:
-- a generic debugging tool
-- an AI coding assistant
-- an app development platform
-- a native iOS app
-- a generic SaaS analytics dashboard
-- a generic App Store scraper
+
+* generic AI coding assistant
+* generic debugging assistant
+* generic analytics dashboard
+* social network
+* developer community
+* project management tool
+* app development platform
+* native mobile app
+* generic App Store scraper
+* huge enterprise platform
+
+Do not add:
+
+* cryptocurrency
+* gamification
+* chat rooms
+* unnecessary team collaboration
+* unnecessary agents
+* unnecessary infrastructure
+* unnecessary billing complexity
+
 The product remains:
+
 **Fix It — Check your app before you submit it.**
 
 ---
 
-## 69. DO NOT ADD USELESS FEATURES
-Do not add:
-- social feed
-- chat between users
-- unnecessary team features
-- complex billing
-- cryptocurrency
-- gamification
-- unnecessary analytics
-- unnecessary AI agents
-- unnecessary microservices
-- unnecessary infrastructure
-Build the useful MVP.
+# 89. MVP VS LONG-TERM VISION
 
----
+## MVP
 
-## 70. IMPORTANT ARCHITECTURE SUMMARY
-The final architecture should essentially be:
+Build enough to validate:
+
 ```text
- FIX IT WEB APP
- │
- ▼
- React + Vite + TS
- │
- supabase-js
- │
- ▼
- ┌────────────────┐
- │   SUPABASE     │
- │                │
- │ Auth           │
- │ PostgreSQL     │
- │ Storage        │
- │ Edge Functions │
- │ Realtime       │
- └────────────────┘
- │ │ │
- │ │ └──── Ollama
- │ │
- │ └────────── App Store Connect
- │
- └──────────────── iTunes Search
+IPA
++
+screenshots
++
+metadata
+↓
+analysis
+↓
+findings
+↓
+AI explanation
+↓
+fix
+↓
+recheck
+↓
+comparison
+↓
+rejection solver
+```
+
+This is already enough to deliver real value.
+
+## NEXT
+
+Based on user demand:
+
+```text
+fix verification
+submission checklist
+rejection response generator
+persistent history
+```
+
+## AFTER VALIDATION
+
+```text
+App Store Connect
+↓
+sync
+↓
+monitoring
+↓
+notifications
+```
+
+## LONG-TERM
+
+```text
+continuous monitoring
++
+historical app memory
++
+policy freshness
++
+change-aware risk detection
++
+review lifecycle intelligence
 ```
 
 ---
 
-## 71. NON-NEGOTIABLE RULES
-Remember these throughout implementation:
+# 90. BUILD PRIORITY
 
-1. **WEB APPLICATION ONLY.**
-2. **NO IOS APP.**
-3. **NO ANDROID APP.**
-4. **NO NATIVE APPLICATION.**
-5. **SUPABASE IS THE BACKEND.**
-6. **OLLAMA IS THE FIRST AI PROVIDER.**
-7. **NO PAYMENT SYSTEM.**
-8. **NO STRIPE.**
-9. **NO FAKE DATA.**
-10. **AI DOES NOT CREATE FINDINGS.**
-11. **THE DETERMINISTIC ANALYSIS ENGINE IS THE SOURCE OF TRUTH.**
-12. **APPLE DATA MUST COME FROM REAL APPLE APIs/WEBHOOKS.**
-13. **PRIVATE CREDENTIALS NEVER GO TO THE BROWSER.**
-14. **DO NOT CLAIM APPLE APPROVAL.**
-15. **DO NOT BUILD USELESS FEATURES.**
-16. **DO NOT REPLACE SUPABASE WITH A CUSTOM BACKEND WITHOUT A REAL TECHNICAL REASON.**
-17. **DO NOT STOP AT A PLAN. ACTUALLY BUILD.**
+## Phase 1 — Foundation
+
+* React/Vite/TypeScript
+* Tailwind
+* routing
+* Supabase
+* database
+* RLS
+* authentication
+* base layout
+
+## Phase 2 — Public
+
+* landing
+* public Apple search
+* app preview
+* locked Fix It preview
+
+## Phase 3 — Workspace
+
+* dashboard
+* My Apps
+* app details
+* credits
+* notifications
+* empty states
+
+## Phase 4 — Preflight
+
+* IPA upload
+* Storage
+* extraction
+* deterministic checks
+* findings
+* readiness
+* results UI
+
+## Phase 5 — AI
+
+* Ollama provider
+* grounded explanation
+* structured output
+* caching
+* unavailable handling
+
+## Phase 6 — Visual/material analysis
+
+* screenshot analysis
+* metadata checks
+* cross-material consistency
+
+## Phase 7 — Recheck
+
+* new build
+* comparison
+* fixed
+* remaining
+* new
+* fix verification
+
+## Phase 8 — Rejection
+
+* rejection solver
+* rejection history
+* response generator
+
+## Phase 9 — App Store Connect
+
+* credentials
+* server-side JWT
+* connection
+* app discovery
+* sync
+
+## Phase 10 — Monitoring
+
+* webhook
+* verification
+* event processing
+* timeline
+* notifications
+* Realtime
+
+## Phase 11 — Connected data
+
+* TestFlight
+* reviews
+* supported metadata/status
+
+## Phase 12 — Long-term intelligence
+
+* app memory
+* policy references
+* change-aware analysis
+* recurring risk detection
 
 ---
 
-## 72. START NOW
-You have the complete product requirements.
-You are authorized to start implementation immediately.
-Do NOT return another planning document.
+# 91. DEVELOPMENT RULE
 
-Do NOT ask me to approve the architecture.
-Do NOT say "here is what I would build."
-**BUILD IT.**
+Do not build the entire system blindly.
 
-Start with:
-**Phase 1 — Foundation**
-and continue through the phases in order.
+After every major module:
 
-After implementation, report:
-1. What was actually built
-2. What is working
-3. What was tested
-4. Any genuine blockers
-5. What remains to be implemented
+```text
+BUILD
+ ↓
+RUN
+ ↓
+TEST
+ ↓
+FIX
+ ↓
+VERIFY
+ ↓
+CONTINUE
+```
 
-But the primary task is:
-**BUILD FIX IT.**
+Never stack ten broken modules together.
+
+---
+
+# 92. TEST MATRIX
+
+## Authentication
+
+* signup
+* login
+* logout
+* session persistence
+* protected routes
+
+## Public search
+
+* valid search
+* empty results
+* API failure
+* malformed query
+
+## IPA
+
+* valid IPA
+* invalid file
+* malformed archive
+* missing bundle
+* missing plist
+* unsupported structure
+
+## Deterministic analysis
+
+* critical issue
+* warning
+* suggestion
+* clean result
+* unavailable check
+
+## AI
+
+* provider available
+* provider unavailable
+* grounded explanation
+* malformed model response
+* hallucination-resistant context
+* caching
+
+## Screenshots
+
+* valid image
+* wrong dimensions
+* multiple screenshots
+* missing image
+* visual assessment failure
+
+## Recheck
+
+* issue remains
+* issue resolved
+* new issue appears
+* unable to verify
+
+## App Store Connect
+
+* invalid credentials
+* valid credentials
+* insufficient permissions
+* app discovery
+* sync
+* pagination
+* API error
+
+## Webhooks
+
+* valid signature
+* invalid signature
+* duplicate event
+* malformed event
+* idempotent processing
+
+## Rejection solver
+
+* normal rejection
+* complex rejection
+* missing context
+* response generation
+
+## Security
+
+* user A cannot access user B
+* private IPA unavailable publicly
+* credentials never returned
+* service-role key never reaches browser
+
+---
+
+# 93. OBSERVABILITY
+
+Internally track:
+
+* analysis failures
+* AI failures
+* upload failures
+* Apple API failures
+* webhook failures
+* processing times
+* check completion rate
+* notification creation errors
+
+Do not expose internal technical data to normal users.
+
+---
+
+# 94. LOGGING
+
+Log useful operational information.
+
+Never log:
+
+* Apple private keys
+* sensitive credentials
+* private user secrets
+* unnecessary raw private uploads
+
+Logs should help debug system behavior without becoming a security problem.
+
+---
+
+# 95. PERFORMANCE PRINCIPLE
+
+Keep MVP analysis lightweight.
+
+Focus on:
+
+* extraction
+* plist parsing
+* metadata inspection
+* deterministic checks
+
+Do not assume serverless functions can perform unlimited heavy processing.
+
+If a task exceeds the environment's practical constraints:
+
+implement the simplest reliable solution and clearly communicate limitations.
+
+Never fake successful processing.
+
+---
+
+# 96. RESPONSIVE WEB
+
+The application should remain usable on smaller screens.
+
+But:
+
+**responsive web is still web.**
+
+Do not create a second native mobile application.
+
+---
+
+# 97. EMPTY STATES
+
+Examples:
+
+### No apps
+
+> No apps yet. Check your first app.
+
+### No checks
+
+> No checks yet. Upload a build to start.
+
+### No notifications
+
+> You're all caught up.
+
+### No reviews
+
+> No reviews available.
+
+### No monitoring
+
+> Connect App Store Connect to start monitoring.
+
+---
+
+# 98. UX PRINCIPLE — ALWAYS SHOW THE NEXT ACTION
+
+Fix It should not leave developers wondering:
+
+> "Okay... what now?"
+
+Every major result should provide a next step.
+
+Examples:
+
+```text
+Issue found
+→ View issue
+
+Issue understood
+→ Fix it
+
+Developer fixed it
+→ Upload new build
+
+New build uploaded
+→ Compare
+
+Ready
+→ Connect App Store Connect
+
+Rejected
+→ Analyze rejection
+
+Rejection analyzed
+→ Fix issue
+
+Fix completed
+→ Recheck
+```
+
+The interface should continuously move the developer forward.
+
+---
+
+# 99. THE MOST IMPORTANT LOOP
+
+The highest-value loop is:
+
+```text
+CHECK
+ ↓
+FIND
+ ↓
+EXPLAIN
+ ↓
+FIX
+ ↓
+VERIFY
+ ↓
+CHECK AGAIN
+```
+
+The product should optimize for that loop.
+
+---
+
+# 100. THE RETENTION LOOP
+
+The long-term retention loop is:
+
+```text
+Developer ships app
+        ↓
+Uses Fix It
+        ↓
+Fixes problems
+        ↓
+Submits
+        ↓
+App changes
+        ↓
+Fix It monitors
+        ↓
+New build
+        ↓
+Fix It checks again
+        ↓
+New review
+        ↓
+Rejection or approval
+        ↓
+Fix It helps
+        ↓
+Developer ships again
+```
+
+That means the customer naturally has reasons to return.
+
+---
+
+# 101. THE LONG-TERM MOAT
+
+Do not think the moat is:
+
+> "We have an AI."
+
+The long-term advantage should come from:
+
+### 1. App history
+
+Fix It knows what happened previously.
+
+### 2. Fix verification
+
+Fix It knows whether problems actually disappeared.
+
+### 3. Review lifecycle
+
+Fix It stays with the developer before and after submission.
+
+### 4. Evidence
+
+Important conclusions are connected to actual evidence.
+
+### 5. Policy freshness
+
+References can remain aligned with current Apple guidance.
+
+### 6. Change detection
+
+Fix It notices meaningful changes.
+
+### 7. Continuous monitoring
+
+The product remains useful after the initial scan.
+
+---
+
+# 102. FINAL PRODUCT ARCHITECTURE
+
+```text
+                         FIX IT
+                           │
+                           ▼
+                    DEVELOPER APP
+                           │
+          ┌────────────────┼────────────────┐
+          │                │                │
+          ▼                ▼                ▼
+         IPA          SCREENSHOTS       METADATA
+          │                │                │
+          └────────────────┼────────────────┘
+                           ▼
+                DETERMINISTIC ANALYSIS
+                           │
+                           ▼
+                     FINDINGS
+                           │
+                           ▼
+                  EVIDENCE / SOURCES
+                           │
+                           ▼
+                   AI EXPLANATION
+                           │
+                           ▼
+                         FIX
+                           │
+                           ▼
+                       RECHECK
+                           │
+                           ▼
+                      COMPARISON
+                           │
+                  ┌────────┴────────┐
+                  ▼                 ▼
+               REMAINING          FIXED
+                  │                 │
+                  └────────┬────────┘
+                           ▼
+                     READY TO SUBMIT
+                           │
+                           ▼
+                  APP STORE CONNECT
+                           │
+                           ▼
+                      SUBMISSION
+                           │
+                     APP REVIEW
+                    /           \
+                   /             \
+                  ▼               ▼
+             APPROVED          REJECTED
+                │                 │
+                ▼                 ▼
+            MONITOR          REJECTION AI
+                                  │
+                                  ▼
+                             FIX CHECKLIST
+                                  │
+                                  ▼
+                              NEW BUILD
+                                  │
+                                  ▼
+                             VERIFICATION
+                                  │
+                                  ▼
+                               RESCAN
+                                  │
+                                  ▼
+                              RESUBMIT
+                                  │
+                                  └──────► MONITOR
+                                             │
+                                             ▼
+                                          APPROVED
+```
+
+---
+
+# 103. FINAL NON-NEGOTIABLE RULES FOR THE AI CODING AGENT
+
+The coding agent must remember:
+
+1. Fix It is a web application.
+2. Never create a native iOS application.
+3. Supabase is the default backend.
+4. Use real Apple data.
+5. Never fabricate data.
+6. The deterministic engine creates findings.
+7. AI explains findings.
+8. AI must not invent findings.
+9. Never claim guaranteed Apple approval.
+10. Never expose Apple private credentials to the browser.
+11. Keep IPA files private.
+12. Use RLS for user data.
+13. Verify webhook signatures.
+14. Deduplicate webhook events.
+15. Use real loading states.
+16. Do not show fake progress.
+17. Do not show fake scores.
+18. Do not turn unavailable data into a pass.
+19. Do not create fake reviews.
+20. Do not create fake notifications.
+21. Do not create fake Apple statuses.
+22. Do not build unnecessary infrastructure.
+23. Keep the architecture simple.
+24. Build incrementally.
+25. Test every major phase.
+26. Preserve source provenance.
+27. Treat user-marked "fixed" separately from system-verified resolution.
+28. Compare actual builds.
+29. Maintain app history.
+30. Keep AI grounded in supplied evidence.
+31. Use cautious language where certainty is impossible.
+32. The product must continue working when AI is unavailable.
+33. The product must continue working when optional integrations are unavailable.
+34. Always show the next useful action.
+35. Do not change the product into a generic AI tool.
+
+---
+
+# 104. THE ONE-SENTENCE DEFINITION
+
+If the entire product ever becomes confusing, return to this:
+
+**Fix It helps an iOS developer find potential App Store problems, understand them, fix them, verify the fixes, submit the app, monitor what happens, understand rejection when it occurs, and get back to a clean resubmission.**
+
+---
+
+# 105. THE ULTIMATE PRODUCT LOOP
+
+```text
+BUILD
+ ↓
+CHECK
+ ↓
+UNDERSTAND
+ ↓
+FIX
+ ↓
+VERIFY
+ ↓
+SUBMIT
+ ↓
+MONITOR
+ ↓
+APPROVED
+        OR
+REJECTED
+ ↓
+UNDERSTAND
+ ↓
+FIX
+ ↓
+VERIFY
+ ↓
+RESUBMIT
+ ↓
+MONITOR
+ ↓
+APPROVED
+```
+
+That is Fix It.
