@@ -2,7 +2,8 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "excludeFiles": "{node_modules/vite/**,node_modules/rollup/**,node_modules/@rollup/**,node_modules/@vitejs/**,node_modules/@tailwindcss/**}"
     }
   },
   "rewrites": [
