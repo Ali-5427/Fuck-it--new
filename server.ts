@@ -648,9 +648,3 @@ export function createServerApp() {
 
   return app;
 }
-
-if (process.argv.some(arg => /(?:^|[\\/])server\.ts$/.test(arg))) {
-  import('./devServer.js').then(({ startServer }) => startServer()).catch((err) => {
-    console.error('Failed to start server:', err);
-  });
-}
