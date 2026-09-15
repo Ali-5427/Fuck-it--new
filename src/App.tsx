@@ -51,7 +51,7 @@ export default function App() {
       const currentUser = store.getUser();
       if (!currentUser && currentView !== 'landing' && currentView !== 'search') {
         setCurrentView('landing');
-      } else if (currentUser && (currentView === 'landing' || currentView === 'search')) {
+      } else if (currentUser && currentView === 'landing') {
         setCurrentView('preflight');
       }
     });
@@ -248,7 +248,7 @@ export default function App() {
           <main className="flex-1 overflow-hidden h-full min-h-0 overflow-y-auto">
             {currentView === 'search' && (
               <Suspense fallback={<ViewLoadingFallback />}>
-                <PublicAppSearch />
+                <PublicAppSearch onSelectApp={(id) => void handleTryNow(id)} />
               </Suspense>
             )}
 
@@ -565,7 +565,7 @@ export default function App() {
       <main className="flex-1 min-h-0 overflow-y-auto">
         <Suspense fallback={<ViewLoadingFallback />}>
           {currentView === 'search' ? (
-            <PublicAppSearch />
+            <PublicAppSearch onSelectApp={(id) => void handleTryNow(id)} />
           ) : (
             <LandingPage
               onStartAudit={handleLandingStartAudit}

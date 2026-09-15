@@ -16,12 +16,16 @@ interface SearchResult {
   formattedPrice?: string;
 }
 
-export function PublicAppSearch() {
+interface PublicAppSearchProps {
+  onSelectApp?: (id: string, name: string) => void;
+}
+
+export function PublicAppSearch({ onSelectApp }: PublicAppSearchProps = {}) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,13 +47,9 @@ export function PublicAppSearch() {
   };
 
   const handleAppSelect = (app: SearchResult) => {
-    // In a real router, we'd navigate to /apps/preview/:id
-    // But for this MVP without React Router, we'll try to emulate the try-now preview.
-    // For now, we'll set the currentView in App.tsx or use a modal.
-    store.dispatch({
-      type: 'START_TRY_NOW',
-      payload: app.trackId.toString()
-    });
+    if (onSelectApp) {
+      onSelectApp(app.trackId.toString(), app.trackName);
+    }
   };
 
   return (
