@@ -4,7 +4,7 @@ import {
   enhanceAuditWithAI, 
   analyzeAppleRejectionWithAI, 
   analyzeMetadataWithAI 
-} from './src/server/geminiService.js';
+} from './src/server/ollamaService.js';
 import { APP_STORE_RULES } from './src/engine/rules.js';
 import { APPLE_GUIDELINE_SOURCES } from './src/engine/appleSources.js';
 import { extractFromItunesLookup } from './src/engine/itunesExtractor.js';
