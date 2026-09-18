@@ -7,6 +7,7 @@ import { AuditView } from './components/AuditView';
 import { SiteFooter } from './components/SiteFooter';
 import { PreflightHome } from './preflight/PreflightHome';
 import { PreflightApp } from './preflight/PreflightApp';
+import { AppStorePreview } from './components/AppStorePreview';
 
 // Lazy-loaded secondary views & modals
 const RejectionAnalyzer = lazy(() => import('./components/RejectionAnalyzer').then(m => ({ default: m.RejectionAnalyzer })));
@@ -96,12 +97,15 @@ export default function App() {
   const [tryNowResult, setTryNowResult] = useState<{
     app: Application;
     audit: AuditRun;
+    inspection: any;
     query: string;
   } | null>(null);
+  const [tryNowShowAudit, setTryNowShowAudit] = useState(false);
   const [tryNowQuery, setTryNowQuery] = useState('');
 
   const handleTryNow = async (query: string) => {
     setTryNowLoading(true);
+    setTryNowShowAudit(false);
     setTryNowError(null);
     setTryNowQuery(query);
 
@@ -141,6 +145,7 @@ export default function App() {
       setTryNowResult({
         app: mockApp,
         audit: auditRun,
+        inspection: inspection,
         query
       });
       setTryNowLoading(false);
@@ -466,6 +471,16 @@ export default function App() {
   }
 
   if (tryNowResult) {
+    if (!tryNowShowAudit) {
+      return (
+        <AppStorePreview 
+          inspection={tryNowResult.inspection}
+          onAuditClick={() => setTryNowShowAudit(true)}
+          onBack={() => setTryNowResult(null)}
+        />
+      );
+    }
+
     return (
       <div className="min-h-screen bg-white text-slate-900 flex flex-col selection:bg-blue-600 selection:text-white">
         <header className="sticky top-0 z-50 w-full transition-all">
@@ -473,7 +488,7 @@ export default function App() {
             <div className="flex h-14 items-center justify-between rounded-full border border-slate-200/60 bg-transparent px-5 sm:px-7 backdrop-blur-[4px] shadow-xs" style={{ boxShadow: 'inset 0 1.5px 0 rgba(255, 255, 255, 0.95), 0 8px 30px rgba(0, 0, 0, 0.03)' }}>
               <div className="flex items-center gap-3">
                 <button 
-                  onClick={() => setTryNowResult(null)}
+                  onClick={() => setTryNowShowAudit(false)}
                   className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
                 >
                   <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-500 text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
@@ -483,10 +498,10 @@ export default function App() {
                 </button>
               </div>
               <button
-                onClick={() => setTryNowResult(null)}
+                onClick={() => setTryNowShowAudit(false)}
                 className="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition-colors cursor-pointer"
               >
-                ← Back to Home
+                ← Back to App
               </button>
             </div>
           </div>
@@ -514,7 +529,7 @@ export default function App() {
                 updatedAt: new Date().toISOString(),
                 remainingIssuesCount: auditRun.openFindings
               };
-              setTryNowResult({ app: nextApp, audit: auditRun, query });
+              setTryNowResult({ app: nextApp, audit: auditRun, inspection, query });
             }}
             tryNowLookupQuery={tryNowQuery}
           />
