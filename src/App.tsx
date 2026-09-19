@@ -109,21 +109,21 @@ export default function App() {
 
     try {
       setTryNowStep(1);
-      setTryNowStatusText('Looking up your app in App Store registry...');
+      setTryNowStatusText('Finding app details...');
 
       const apiPromise = apiClient.tryNow(query);
       await new Promise(r => setTimeout(r, 600));
 
       setTryNowStep(2);
-      setTryNowStatusText('Checking the listing and metadata...');
+      setTryNowStatusText('Reading description & metadata...');
       await new Promise(r => setTimeout(r, 700));
 
       setTryNowStep(3);
-      setTryNowStatusText('Analyzing screenshots and validation parameters...');
+      setTryNowStatusText('Checking Apple guidelines...');
       await new Promise(r => setTimeout(r, 600));
 
       setTryNowStep(4);
-      setTryNowStatusText('Running compliance rule engine...');
+      setTryNowStatusText('Scanning for common App Store rejections...');
 
       const { inspection, auditRun } = await apiPromise;
 
@@ -447,7 +447,7 @@ export default function App() {
       <div className="min-h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-6 space-y-6">
         <div className="max-w-md w-full text-center space-y-4">
           <Loader2 className="h-10 w-10 text-blue-600 animate-spin mx-auto" />
-          <h2 className="text-xl font-bold text-slate-900 font-mono">Running Preflight Check</h2>
+          <h2 className="text-xl font-bold text-slate-900 font-mono">Analyzing your app...</h2>
           <p className="text-xs text-slate-500 font-mono">{tryNowStatusText}</p>
           
           {/* Progress bar */}
@@ -458,10 +458,10 @@ export default function App() {
             ></div>
           </div>
           <div className="flex justify-between text-[10px] font-mono text-slate-400">
-            <span>Query App Store</span>
-            <span>Parse Listing</span>
-            <span>Validate Specs</span>
-            <span>Run Rules</span>
+            <span>Finding app</span>
+            <span>Reading details</span>
+            <span>Checking rules</span>
+            <span>Generating report</span>
           </div>
         </div>
       </div>
