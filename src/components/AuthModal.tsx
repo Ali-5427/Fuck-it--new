@@ -137,7 +137,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden px-6 py-8 sm:px-8 sm:py-10 space-y-6 max-h-[95vh] overflow-y-auto">
+      <div className="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden p-6 space-y-5 max-h-[95vh] overflow-y-auto">
         
         <button
           id="auth_modal_close_btn"
@@ -156,20 +156,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <h3 className="text-2xl font-bold tracking-tight text-slate-900">
               {mode === 'login' ? 'Welcome back' : mode === 'register' ? 'Create an account' : 'Reset password'}
             </h3>
-            <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
+            <p className="text-sm text-slate-500 mt-1 leading-relaxed">
               {mode === 'login' ? 'Enter your details to sign in to Fixit.' : mode === 'register' ? 'Start auditing iOS binaries and resolving App Review risks.' : 'We will send recovery instructions.'}
             </p>
           </div>
         </div>
 
         {/* Google SSO */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <button
             type="button"
             id="auth_google_btn"
             onClick={handleGoogleAuth}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 py-2.5 px-3 text-sm font-semibold text-slate-700 transition-all shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 py-2 px-3 text-sm font-semibold text-slate-700 transition-all shadow-sm cursor-pointer"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
@@ -188,45 +188,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           
           {mode === 'register' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Name</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Team / Org <span className="text-slate-400 font-normal">(Optional)</span></label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Team / Org <span className="text-slate-400 font-normal">(Optional)</span></label>
                 <input
                   type="text"
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
             />
           </div>
 
           {mode !== 'forgot' && (
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-semibold text-slate-700">Password</label>
                 {mode === 'login' && (
                   <button type="button" onClick={() => setMode('forgot')} className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer">
@@ -238,7 +238,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
               />
             </div>
           )}
@@ -279,7 +279,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all cursor-pointer"
             >
               <span>{isLoading ? 'Authenticating...' : mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : 'Send Instructions'}</span>
             </button>
