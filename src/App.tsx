@@ -100,12 +100,10 @@ export default function App() {
     inspection: any;
     query: string;
   } | null>(null);
-  const [tryNowShowAudit, setTryNowShowAudit] = useState(false);
   const [tryNowQuery, setTryNowQuery] = useState('');
 
   const handleTryNow = async (query: string) => {
     setTryNowLoading(true);
-    setTryNowShowAudit(false);
     setTryNowError(null);
     setTryNowQuery(query);
 
@@ -471,92 +469,37 @@ export default function App() {
   }
 
   if (tryNowResult) {
-    if (!tryNowShowAudit) {
-      return (
+    return (
+      <>
         <AppStorePreview 
           inspection={tryNowResult.inspection}
-          onAuditClick={() => setTryNowShowAudit(true)}
+          onAuditClick={() => {
+            if (user) {
+              setTryNowResult(null);
+              setCurrentView('dashboard');
+              setUploadModalOpen(true);
+            } else {
+              handleOpenAuth('register');
+            }
+          }}
           onBack={() => setTryNowResult(null)}
         />
-      );
-    }
-
-    return (
-      <div className="min-h-screen bg-white text-slate-900 flex flex-col selection:bg-blue-600 selection:text-white">
-        <header className="sticky top-0 z-50 w-full transition-all">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-4 pb-2">
-            <div className="flex h-14 items-center justify-between rounded-full border border-slate-200/60 bg-transparent px-5 sm:px-7 backdrop-blur-[4px] shadow-xs" style={{ boxShadow: 'inset 0 1.5px 0 rgba(255, 255, 255, 0.95), 0 8px 30px rgba(0, 0, 0, 0.03)' }}>
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => setTryNowShowAudit(false)}
-                  className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
-                >
-                  <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-500 text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
-                    <ShieldCheck className="h-4.5 w-4.5 text-white" />
-                  </div>
-                  <span className="font-bold text-base tracking-tight text-slate-900 font-mono">Fixit</span>
-                </button>
-              </div>
-              <button
-                onClick={() => setTryNowShowAudit(false)}
-                className="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition-colors cursor-pointer"
-              >
-                ← Back to App
-              </button>
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 min-h-0">
-          <AuditView
-            app={tryNowResult.app}
-            audit={tryNowResult.audit}
-            auditsHistory={[tryNowResult.audit]}
-            onSelectFinding={(f) => setSelectedFinding(f)}
-            onOpenUpload={() => {}}
-            onGenerateReport={() => {}}
-            onOpenDiff={() => {}}
-            isTryNow={true}
-            onOpenAuth={handleOpenAuth}
-            onTryNowRecheck={async (query) => {
-              const { inspection, auditRun } = await apiClient.tryNow(query);
-              const nextApp: Application = {
-                ...tryNowResult.app,
-                name: inspection.appName,
-                bundleId: inspection.bundleId,
-                currentVersion: inspection.version,
-                currentBuild: '1',
-                primaryCategory: inspection.metadata.category || 'Utilities',
-                updatedAt: new Date().toISOString(),
-                remainingIssuesCount: auditRun.openFindings
-              };
-              setTryNowResult({ app: nextApp, audit: auditRun, inspection, query });
-            }}
-            tryNowLookupQuery={tryNowQuery}
-          />
-        </main>
-
         <Suspense fallback={null}>
-          {selectedFinding && (
-            <FindingDetailModal
-              finding={selectedFinding}
-              appId={tryNowResult?.app?.id || ''}
-              auditId={tryNowResult?.audit?.id || ''}
-              currentBuild="1"
-              onClose={() => setSelectedFinding(null)}
-            />
-          )}
-
           {authModalOpen && (
             <AuthModal
               isOpen={authModalOpen}
               onClose={() => setAuthModalOpen(false)}
               initialMode={authModalMode}
               initialTier={authModalTier}
-              onSuccess={() => setCurrentView('preflight')}
+              onSuccess={() => {
+                setTryNowResult(null);
+                setCurrentView('dashboard');
+                setUploadModalOpen(true);
+              }}
             />
           )}
         </Suspense>
-      </div>
+      </>
     );
   }
 
