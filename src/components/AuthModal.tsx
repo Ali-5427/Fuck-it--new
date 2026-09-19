@@ -40,6 +40,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [tier, setTier] = useState<'free' | 'pro' | 'studio'>(initialTier);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [teamName, setTeamName] = useState('');
   const [appleTeamId, setAppleTeamId] = useState('');
@@ -75,6 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else if (mode === 'register') {
         if (!email) throw new Error('Please enter your email.');
         if (!password || password.length < 6) throw new Error('Password must be at least 6 characters.');
+        if (password !== confirmPassword) throw new Error('Passwords do not match.');
         const regName = name || (email ? email.split('@')[0] : 'iOS Developer');
         await authService.registerWithEmail(
           email, 
@@ -201,16 +203,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
                 />
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Team / Org <span className="text-slate-400 font-normal">(Optional)</span></label>
-                <input
-                  type="text"
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
-                />
-              </div>
             </div>
           )}
 
@@ -225,21 +217,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           {mode !== 'forgot' && (
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-semibold text-slate-700">Password</label>
-                {mode === 'login' && (
-                  <button type="button" onClick={() => setMode('forgot')} className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer">
-                    Forgot password?
-                  </button>
-                )}
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700">Password</label>
+                  {mode === 'login' && (
+                    <button type="button" onClick={() => setMode('forgot')} className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer">
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                />
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
-              />
+
+              {mode === 'register' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Confirm Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                  />
+                </div>
+              )}
             </div>
           )}
 
