@@ -137,168 +137,128 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden p-6 space-y-5 max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden px-6 py-8 sm:px-8 sm:py-10 space-y-6 max-h-[95vh] overflow-y-auto">
         
+        <button
+          id="auth_modal_close_btn"
+          onClick={onClose}
+          className="absolute top-4 right-4 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-base leading-tight font-mono">
-                {mode === 'login' ? 'Sign In to Fixit' : mode === 'register' ? 'Create Developer Account' : 'Reset Password'}
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                {mode === 'login' ? 'Access your App Store preflight audits' : mode === 'register' ? 'Inspect iOS binaries and resolve App Review risks' : 'We will send one-time recovery instructions'}
-              </p>
-            </div>
+        <div className="flex flex-col items-center text-center space-y-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md">
+            <ShieldCheck className="h-6 w-6" />
           </div>
-          <button
-            id="auth_modal_close_btn"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div>
+            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
+              {mode === 'login' ? 'Welcome back' : mode === 'register' ? 'Create an account' : 'Reset password'}
+            </h3>
+            <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
+              {mode === 'login' ? 'Enter your details to sign in to Fixit.' : mode === 'register' ? 'Start auditing iOS binaries and resolving App Review risks.' : 'We will send recovery instructions.'}
+            </p>
+          </div>
         </div>
 
         {/* Google SSO */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <button
             type="button"
             id="auth_google_btn"
             onClick={handleGoogleAuth}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 py-2.5 px-3 text-xs font-semibold text-slate-800 transition-all shadow-xs cursor-pointer hover:border-blue-300 group"
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 py-2.5 px-3 text-sm font-semibold text-slate-700 transition-all shadow-sm cursor-pointer"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-              />
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" />
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z" />
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
             </svg>
-            <span className="group-hover:text-blue-600">Continue with Google</span>
+            <span>Continue with Google</span>
           </button>
 
-          <div className="flex items-center gap-2 py-1">
+          <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-slate-200"></div>
-            <span className="text-[10px] font-mono text-slate-400 uppercase">or with email</span>
+            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">or continue with</span>
             <div className="h-px flex-1 bg-slate-200"></div>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Plan Selector when in Register mode */}
-                    {/* Plan selector removed per user request */}
-
           {mode === 'register' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                <div className="relative">
-                  <UserIcon className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Steve Wozniak"
-                    className="w-full rounded-xl border border-slate-300 bg-white pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Team / Org (Optional)</label>
-                <div className="relative">
-                  <Building2 className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    placeholder="Apex Mobile LLC"
-                    className="w-full rounded-xl border border-slate-300 bg-white pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Team / Org <span className="text-slate-400 font-normal">(Optional)</span></label>
+                <input
+                  type="text"
+                  value={teamName}
+                  onChange={(e) => setTeamName(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+                />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Developer Email</label>
-            <div className="relative">
-              <Mail className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@example.com"
-                className="w-full rounded-xl border border-slate-300 bg-white pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+            />
           </div>
 
           {mode !== 'forgot' && (
             <div>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <label className="font-semibold text-slate-700">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700">Password</label>
                 {mode === 'login' && (
-                  <button
-                    type="button"
-                    onClick={() => setMode('forgot')}
-                    className="text-blue-600 hover:underline text-[11px] font-medium cursor-pointer"
-                  >
+                  <button type="button" onClick={() => setMode('forgot')} className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer">
                     Forgot password?
                   </button>
                 )}
               </div>
-              <div className="relative">
-                <Lock className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-xl border border-slate-300 bg-white pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:outline-none transition-all"
+              />
             </div>
           )}
 
-
-
           {mode === 'login' && (
-            <div className="flex items-center justify-between text-xs text-slate-600 pt-1">
+            <div className="flex items-center text-xs text-slate-600 pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5 cursor-pointer"
                 />
-                <span>Remember this developer session</span>
+                <span className="font-medium">Remember for 30 days</span>
               </label>
             </div>
           )}
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 animate-in fade-in">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-700 animate-in fade-in">
               {errorMsg}
             </div>
           )}
@@ -315,40 +275,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all font-mono cursor-pointer"
-          >
-            <span>{isLoading ? 'Authenticating...' : mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : 'Send Instructions'}</span>
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all cursor-pointer"
+            >
+              <span>{isLoading ? 'Authenticating...' : mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : 'Send Instructions'}</span>
+            </button>
+          </div>
         </form>
 
         {/* Footer Mode Switcher */}
-        <div className="pt-3 border-t border-slate-200 text-center text-xs text-slate-500">
+        <div className="text-center text-sm text-slate-500 pt-2">
           {mode === 'login' ? (
             <span>
               Don't have an account?{' '}
               <button 
                 type="button" 
                 onClick={() => setMode('register')} 
-                className="text-blue-600 hover:underline font-semibold cursor-pointer"
+                className="text-slate-900 hover:underline font-semibold cursor-pointer"
               >
-                Sign up free
+                Sign up
               </button>
             </span>
-          ) : (
+          ) : mode === 'register' ? (
             <span>
               Already have an account?{' '}
               <button 
                 type="button" 
                 onClick={() => setMode('login')} 
-                className="text-blue-600 hover:underline font-semibold cursor-pointer"
+                className="text-slate-900 hover:underline font-semibold cursor-pointer"
               >
-                Sign in
+                Log in
               </button>
             </span>
+          ) : (
+            <button 
+              type="button" 
+              onClick={() => setMode('login')} 
+              className="text-slate-900 hover:underline font-semibold cursor-pointer text-sm"
+            >
+              Back to log in
+            </button>
           )}
         </div>
 
